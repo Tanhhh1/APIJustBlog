@@ -1,0 +1,24 @@
+﻿using Domain.Entities;
+using FluentValidation;
+
+
+namespace Application.Validators.Category
+{
+    public class CategoryValidator : AbstractValidator<CategorySaveDTO>
+    {
+        public CategoryValidator()
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty().WithMessage("Name is required.")
+                .MaximumLength(255).WithMessage("Name must not exceed 255 characters.");
+
+            RuleFor(x => x.UrlSlug)
+                .NotEmpty().WithMessage("UrlSlug is required.")
+                .MaximumLength(450).WithMessage("UrlSlug must not exceed 450 characters.");
+
+            RuleFor(x => x.Description)
+                .NotEmpty().WithMessage("Description is required.")
+                .MaximumLength(1000).WithMessage("Description must not exceed 1000 characters.");
+        }
+    }
+}
