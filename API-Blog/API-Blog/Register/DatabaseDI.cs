@@ -11,11 +11,11 @@ namespace API_Blog.Register
             var section = configuration.GetSection("Database");
             services.Configure<DatabaseConfiguration>(section);
             var databaseConfig = section.Get<DatabaseConfiguration>();
-            if (databaseConfig == null) 
-            {
-                throw new Exception("Database configuration not found! Please check 'appsettings.json' file again.");
-            }
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(databaseConfig.Main, opt => opt.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
+            if (databaseConfig == null) throw new Exception("Database configuration not found! Please check 'appsettings.json' file again.");
+            services
+                .AddDbContext<DatabaseContext>(options =>
+                    options.UseSqlServer(databaseConfig.Main,
+                        opt => opt.MigrationsAssembly(typeof(DatabaseContext).Assembly.FullName)));
         }
     }
 }

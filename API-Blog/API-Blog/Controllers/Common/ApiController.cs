@@ -3,7 +3,7 @@
 namespace API_Blog.Controllers.Common
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/v{v:apiVersion}/[controller]")]
     public class ApiController : ControllerBase
     {
 

@@ -13,5 +13,7 @@ namespace Application.UnitOfWork
         ITagRepository TagRepository { get; }
         IPostRepository PostRepository { get; }
         IPostTagMapRepository PostTagMapRepository { get; }
+        IUserRefreshTokenRepository UserRefreshTokenRepository { get; }
+        
     }
 }

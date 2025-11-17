@@ -40,5 +40,15 @@ namespace Infrastructure.Repositories.Common
         {
             return await _dbContext.Set<T>().FindAsync(id);
         }
+
+        public IQueryable<T> GetByCondition(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? order = null)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
+            if (expression != null)
+                query = query.Where(expression);
+            if (order != null)
+                query = order(query);
+            return query;
+        }
     }
 }

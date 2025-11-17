@@ -1,4 +1,6 @@
-﻿namespace Infrastructure.Interfaces.Common
+﻿using System.Linq.Expressions;
+
+namespace Infrastructure.Interfaces.Common
 {
     public interface IBaseRepository<T> where T : class
     {
@@ -7,6 +9,7 @@
         Task DeleteAsync(T entity);
         Task<IEnumerable<T>> GetAllAsync();
         Task<T?> GetByIdAsync(int id);
+        IQueryable<T> GetByCondition(Expression<Func<T, bool>>? expression = null, Func<IQueryable<T>, IOrderedQueryable<T>>? order = null);
     }
 
 }

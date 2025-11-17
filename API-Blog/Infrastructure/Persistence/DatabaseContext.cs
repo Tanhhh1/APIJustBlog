@@ -1,11 +1,21 @@
-﻿using Domain.Entities;
+﻿using Domain.Common;
+using Domain.Entities;
+using Domain.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using Domain.Common;
 
 namespace Infrastructure.Persistence
 {
-    public class DatabaseContext : DbContext
+    public class DatabaseContext : IdentityDbContext<AppUser,
+        AppRole,
+        Guid,
+        IdentityUserClaim<Guid>,
+        AppUserRole,
+        IdentityUserLogin<Guid>,
+        IdentityRoleClaim<Guid>,
+        IdentityUserToken<Guid>>
     {
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
@@ -14,6 +24,7 @@ namespace Infrastructure.Persistence
         public DbSet<Post> Posts { get; set; } 
         public DbSet<Tag> Tags { get; set; }
         public DbSet<PostTagMap> PostTagMaps { get; set; }
+        public DbSet<UserRefreshToken> UserRefreshToken { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

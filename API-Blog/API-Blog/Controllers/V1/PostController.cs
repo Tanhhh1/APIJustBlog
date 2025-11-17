@@ -4,6 +4,7 @@ using Application.Interfaces;
 using Application.Models.Post.DTO;
 using Application.Models.Post.Response;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API_Blog.Controllers.V1
@@ -28,7 +29,8 @@ namespace API_Blog.Controllers.V1
                 return NotFound(ApiResult<PostDTO>.Failure(new List<string> { "Post not found " }));
             return Ok(ApiResult<PostDTO>.Success(post));
         }
-        [HttpPost]
+        [HttpPost]  
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreatePost([FromBody] PostSaveDTO createDTO)
         {
             var create = await _postService.CreatePostAsync(createDTO);

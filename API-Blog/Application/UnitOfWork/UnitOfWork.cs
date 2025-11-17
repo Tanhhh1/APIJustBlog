@@ -14,6 +14,7 @@ namespace Application.UnitOfWork
         private IPostRepository? _postRepository;
         private ITagRepository? _tagRepository;
         private IPostTagMapRepository? _postTagMapRepository;
+        private IUserRefreshTokenRepository? _userRefreshTokenRepository;
         public UnitOfWork(DatabaseContext dbContext)
         {
             _dbContext = dbContext;
@@ -22,6 +23,7 @@ namespace Application.UnitOfWork
         public IPostRepository PostRepository => _postRepository ??= new PostRepository(_dbContext);
         public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_dbContext);
         public IPostTagMapRepository PostTagMapRepository => _postTagMapRepository ??= new PostTagMapRepository(_dbContext);
+        public IUserRefreshTokenRepository UserRefreshTokenRepository => _userRefreshTokenRepository ??= new UserRefreshTokenRepository(_dbContext);
 
         public async Task RollbackAsync()
         {
