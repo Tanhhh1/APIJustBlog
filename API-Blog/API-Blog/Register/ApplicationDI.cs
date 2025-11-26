@@ -17,7 +17,7 @@ namespace API_Blog.Register
         public static void AddApplicationConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            //services.AddScoped<ClaimService>();
+            services.AddScoped<ClaimService>();
 
             services.Configure<EmailSetting>(configuration.GetSection("EmailConfiguration"));
 

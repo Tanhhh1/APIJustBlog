@@ -160,7 +160,8 @@ namespace API_Blog.Register
                         IssuerSigningKey = new SymmetricSecurityKey(key),
                         ValidateIssuer = false,
                         ValidateAudience = false,
-                        ValidateLifetime = true
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero
                     };
                 });
         }

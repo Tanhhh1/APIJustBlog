@@ -18,8 +18,15 @@ namespace API_Blog.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCate([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        public async Task<IActionResult> GetAllCate([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null)
         {
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                var result = await _categoryService.SearchAsync(keyword);
+                if (!result.Any())
+                    return NotFound(ApiResult<CategoryResponse>.Failure(new List<string> { "No matching categories found" }));
+                return Ok(result);
+            }
             var paged = await _categoryService.GetAllCateAsync(pageNumber, pageSize);
             return Ok(ApiResult<PageList<CategoryDTO>>.Success(paged));
         }
@@ -57,16 +64,5 @@ namespace API_Blog.Controllers.V1
                 return NotFound(ApiResult<CategoryResponse>.Failure(new List<string> { "Category not found" }));
             return Ok(ApiResult<CategoryResponse>.Success(delete));
         }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchAsync([FromQuery] string keyword)
-        {
-            var result = await _categoryService.SearchAsync(keyword);
-            if (!result.Any())
-                return NotFound(ApiResult<CategoryResponse>.Failure(new List<string> { "No matching categories found" }));
-
-            return Ok(result);
-        }
-
     }
 }

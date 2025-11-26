@@ -29,7 +29,7 @@ public class AppMappingProfile : Profile
         CreateMap<PostTagMap, PostTagMapDTO>().ReverseMap();
         CreateMap<PostTagMapSaveDTO, PostTagMap>();
         CreateMap<IEnumerable<PostTagMap>, PostTagMapResponse>()
-             .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.FirstOrDefault()!.PostId))
+             .ForMember(dest => dest.PostId, opt => opt.MapFrom(src => src.Any() ? src.First().PostId : 0))
              .ForMember(dest => dest.TagNames, opt => opt.MapFrom(src => src.Select(x => x.Tag!.Name).ToList()));
 
     }

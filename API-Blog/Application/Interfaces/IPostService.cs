@@ -8,7 +8,7 @@ namespace Application.Interfaces
     {
         Task<IEnumerable<PostDTO>> GetAllPostAsync();
         Task<PostDTO?> GetByPostIdAsync(int id);
-        Task<PostResponse> CreatePostAsync(PostSaveDTO createDTO);
+        Task<PostResponse> CreatePostAsync(PostSaveDTO createDTO, Guid userId);
         Task<PostResponse> UpdatePostAsync(int id, PostSaveDTO updateDTO);
         Task<PostResponse> DeletePostAsync(int id);
         Task<IEnumerable<PostResponse>> SearchAsync(string keyword);

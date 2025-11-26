@@ -6,19 +6,31 @@ using Application.Models.Post.Response;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Shared.ClaimService;
+using Shared.Logger;
 
 namespace API_Blog.Controllers.V1
 {
     public class PostController : ApiController
     {
         private readonly IPostService _postService;
-        public PostController(IPostService postService)
+        private readonly ClaimService _claimService;
+        public PostController(IPostService postService, ClaimService claimService)
         {
             _postService = postService;
+            _claimService = claimService;
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllPost()
+        public async Task<IActionResult> GetAllPost([FromQuery] string keyword = null)
         {
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                var result = await _postService.SearchAsync(keyword);
+                if (!result.Any())
+                    return NotFound(ApiResult<PostResponse>.Failure(new List<string> { "No matching posts found" }));
+
+                return Ok(result);
+            }
             return Ok(ApiResult<IEnumerable<PostDTO>>.Success(await _postService.GetAllPostAsync()));
         }
         [HttpGet("{id}")]
@@ -33,7 +45,10 @@ namespace API_Blog.Controllers.V1
         [Authorize(Roles = "admin")]
         public async Task<IActionResult> CreatePost([FromBody] PostSaveDTO createDTO)
         {
-            var create = await _postService.CreatePostAsync(createDTO);
+            var userId = _claimService.UserId;
+            if (userId == Guid.Empty)
+                return Unauthorized();
+            var create = await _postService.CreatePostAsync(createDTO, userId);
             return Ok(ApiResult<PostResponse>.Success(create));
         }
         [HttpPut("{id}")]
@@ -51,16 +66,6 @@ namespace API_Blog.Controllers.V1
             if(!delete.Ok)
                 return NotFound(ApiResult<PostResponse>.Failure(new List<string> { "Post not found" }));
             return Ok(ApiResult<PostResponse>.Success(delete));
-        }
-
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchAsync([FromQuery] string keyword)
-        {
-            var result = await _postService.SearchAsync(keyword);
-            if (!result.Any())
-                return NotFound(ApiResult<PostResponse>.Failure(new List<string> { "No matching posts found" }));
-
-            return Ok(result);
         }
     }
 }

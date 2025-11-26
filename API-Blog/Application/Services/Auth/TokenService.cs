@@ -1,5 +1,4 @@
-﻿using System.Security.Authentication;
-using Application.Exceptions;
+﻿using Application.Exceptions;
 using Application.Interfaces.Auth;
 using Application.Models.Auth.DTO;
 using Application.Models.Auth.Response;
@@ -10,7 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Helpers;
+using Shared.Logger;
 using Shared.Models;
+using System.Security.Authentication;
 
 namespace Application.Services.Auth
 {
@@ -45,11 +46,13 @@ namespace Application.Services.Auth
             if (user == null || oldRefreshToken == null || oldRefreshToken.IsUsed || oldRefreshToken.IsRevoked)
                 throw new UnauthorizedException("Unauthorized");
 
-            var refreshTokenValidityInDays = _jwtSetting.TokenValidityInMinutes;
+            var refreshTokenValidityInDays = _jwtSetting.RefreshTokenValidityInDays;
             var dateTimeNow = DateTime.UtcNow;
             var expiryTime = oldRefreshToken.ExpiryTime;
             var difference = dateTimeNow - expiryTime;
-            if (difference.Days > refreshTokenValidityInDays) throw new UnauthorizedException("Unauthorized");
+
+            if (expiryTime < dateTimeNow)
+                throw new UnauthorizedException("Unauthorized");
 
             try
             {
@@ -86,8 +89,9 @@ namespace Application.Services.Auth
                     Expires = dateTimeNow.AddMinutes(_jwtSetting.TokenValidityInMinutes),
                 };
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
+                Logging.Error(ex, "Error during RevokeToken for UserId {UserId}", userId ?? "unknown");
                 throw new BadRequestException("Error get refresh token");
             }
             finally

@@ -22,21 +22,12 @@ namespace API_Blog.Controllers.V1.Auth
         /// </summary>
         [AllowAnonymous]
         [HttpPost("refresh")]
+        [ProducesResponseType(typeof(ApiResult<TokenResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RefreshTokenAsync([FromBody] RefreshTokenRequestDto refreshTokenDto)
         {
-            try
-            {
-                var result = await _tokenService.RefreshTokenAsync(refreshTokenDto);
-
-                return Ok(ApiResult<TokenResponse>.Success(result));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult<SignUpResponse>.Failure(new[]
-                {
-                    ex.Message
-                }));
-            }
+            var result = await _tokenService.RefreshTokenAsync(refreshTokenDto);
+            return Ok(ApiResult<TokenResponse>.Success(result));
         }
 
         /// <summary>
@@ -44,6 +35,8 @@ namespace API_Blog.Controllers.V1.Auth
         /// </summary>
         [AllowAnonymous]
         [HttpPost("revoke")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RevokeTokenAsync([FromBody] RefreshTokenRequestDto refreshTokenDto)
         {
             await _tokenService.RevokeTokenAsync(refreshTokenDto);

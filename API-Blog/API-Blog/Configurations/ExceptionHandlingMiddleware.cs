@@ -1,6 +1,7 @@
-﻿using Application.Exceptions;
+﻿using Application.Common.ModelServices;
+using Application.Exceptions;
+using Shared.Logger;
 using System.Text.Json;
-using Application.Common.ModelServices;
 
 namespace API_Blog.Configurations
 {
@@ -40,6 +41,13 @@ namespace API_Blog.Configurations
                 UnprocessableRequestException => StatusCodes.Status422UnprocessableEntity, //Validation lỗi
                 _ => statusCode
             };
+
+            if (statusCode == StatusCodes.Status500InternalServerError)
+            {
+                Logging.Error(ex, "Unhandled exception at {Path}", httpContext.Request.Path);
+                errors.Clear();
+                errors.Add("Server Error");
+            }
 
             var result = JsonSerializer.Serialize(ApiResult<string>.Failure(errors), new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 

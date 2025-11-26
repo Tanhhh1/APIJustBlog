@@ -32,7 +32,7 @@ namespace Application.UnitOfWork
                 await _transaction.RollbackAsync();
             }
         }
-        public async Task<int> CompleteAsync()
+        public async Task<int> CompleteAsync() //int là số bản ghi thay đổi
         {
             return await _dbContext.SaveChangesAsync();
         }

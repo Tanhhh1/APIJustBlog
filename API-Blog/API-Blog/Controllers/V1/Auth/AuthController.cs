@@ -19,34 +19,24 @@ namespace API_Blog.Controllers.V1.Auth
         /// </summary>
         [AllowAnonymous]
         [HttpPost("sign-up")]
+        [ProducesResponseType(typeof(ApiResult<SignInResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SignUp([FromBody] SignUpDTO request)
         {
-            try
-            {
-                var result = await _authService.SignUpAsync(request);
-                return Ok(ApiResult<SignUpResponse>.Success(result));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult<SignInResponse>.Failure(new[] { ex.Message }));
-            }
+            var result = await _authService.SignUpAsync(request);
+            return Ok(ApiResult<SignUpResponse>.Success(result));
         }
         /// <summary>
         /// Sign In 
         /// </summary>
         [AllowAnonymous]
         [HttpPost("sign-in")]
+        [ProducesResponseType(typeof(ApiResult<SignUpResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SignIn([FromBody] SignInDTO request)
         {
-            try
-            {
-                var result = await _authService.SignInAsync(request);
-                return Ok(ApiResult<SignInResponse>.Success(result));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult<SignInResponse>.Failure(new[]{ ex.Message }));
-            }
+            var result = await _authService.SignInAsync(request);
+            return Ok(ApiResult<SignInResponse>.Success(result));
         }
 
         /// <summary>
@@ -54,17 +44,12 @@ namespace API_Blog.Controllers.V1.Auth
         /// </summary>
         [AllowAnonymous]
         [HttpPost("verify-otp")]
+        [ProducesResponseType(typeof(ApiResult<TokenResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> VerifyTwoFactorOtp(string username, string otp)
         {
-            try
-            {
-                var result = await _authService.VerifyTwoFactorOtpAsync(username, otp);
-                return Ok(ApiResult<TokenResponse>.Success(result));
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ApiResult<TokenResponse>.Failure(new[] { ex.Message }));
-            }
+            var result = await _authService.VerifyTwoFactorOtpAsync(username, otp);
+            return Ok(ApiResult<TokenResponse>.Success(result));
         }
     }
 }

@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Shared.Constants;
 using Shared.Helpers;
+using Shared.Logger;
 using Shared.Models;
 
 namespace Application.Services.Auth
@@ -108,31 +109,37 @@ namespace Application.Services.Auth
             var result = await _userManager.CreateAsync(userNew, request.Password!.NormalizeString(""));
             if (result.Succeeded)
             {
-                await _userManager.AddToRoleAsync(userNew, UserRoleConst.Admin);
+                await _userManager.AddToRoleAsync(userNew, UserRoleConst.Member);
                 return new SignUpResponse()
                 {
                     Ok = true
                 };
             }
+            Logging.Error($"Error register account: {result.Errors}");
             throw new BadRequestException("Account registration failed.");
         }
 
-
         public async Task<TokenResponse> VerifyTwoFactorOtpAsync(string username, string otp)
         {
-            var user = await _userManager.FindByNameAsync(username);
-            if (user == null)
-                throw new Exception("User not found.");
+            try
+            {
+                var user = await _userManager.FindByNameAsync(username);
+                if (user == null)
+                    throw new Exception("User not found.");
 
-            var isValid = await _userManager.VerifyTwoFactorTokenAsync(user, "Email", otp);
+                var isValid = await _userManager.VerifyTwoFactorTokenAsync(user, "Email", otp);
 
-            if (!isValid)
-                throw new Exception("Invalid OTP.");
+                if (!isValid)
+                    throw new Exception("Invalid OTP.");
 
-            return await HandleGenerateToken(user);
+                return await HandleGenerateToken(user);
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "Error during OTP verification for Username {Username}", username);
+                throw new BadRequestException(ex.Message);
+            }
         }
-
-
 
         private async Task<TokenResponse> HandleGenerateToken(AppUser user)
         {

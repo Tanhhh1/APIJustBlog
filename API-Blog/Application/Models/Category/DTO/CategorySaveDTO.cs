@@ -1,7 +1,7 @@
 ﻿using Domain.Common;
 using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Entities
+namespace Application.Models.Category.DTO
 {
     public class CategorySaveDTO
     {

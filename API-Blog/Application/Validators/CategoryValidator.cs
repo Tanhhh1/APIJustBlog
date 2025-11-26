@@ -1,4 +1,4 @@
-﻿using Domain.Entities;
+﻿using Application.Models.Category.DTO;
 using FluentValidation;
 
 
