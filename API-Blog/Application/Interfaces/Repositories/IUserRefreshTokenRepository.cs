@@ -1,7 +1,7 @@
 ﻿using Domain.Entities;
-using Infrastructure.Interfaces.Common;
+using Application.Interfaces.Repositories.Common;
 
-namespace Infrastructure.Interfaces
+namespace Application.Interfaces.Repositories
 {
     public interface IUserRefreshTokenRepository : IBaseRepository<UserRefreshToken>
     {

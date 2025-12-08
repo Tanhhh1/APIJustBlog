@@ -1,11 +1,13 @@
 ﻿using API_Blog.Controllers.Common;
-using Application.DTOs.PostTagMap;
-using Application.Interfaces;
 using Application.Common.ModelServices;
+using Application.DTOs.PostTagMap;
+using Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace API_Blog.Controllers.V1
 {
+    [EnableRateLimiting("CrudPolicy")]
     public class PostTagMapController : ApiController
     {
         private readonly IPostTagMapService _service;

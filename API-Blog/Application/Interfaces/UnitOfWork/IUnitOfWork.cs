@@ -1,7 +1,6 @@
-﻿using Infrastructure.Interfaces;
-using Infrastructure.Repositories;
+﻿using Application.Interfaces.Repositories;
 
-namespace Application.UnitOfWork
+namespace Application.Interfaces.UnitOfWork
 {
     public interface IUnitOfWork
     {

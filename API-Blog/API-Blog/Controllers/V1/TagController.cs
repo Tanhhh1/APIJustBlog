@@ -1,12 +1,14 @@
 ﻿using API_Blog.Controllers.Common;
 using Application.Common.ModelServices;
-using Application.Interfaces;
+using Application.Interfaces.Services;
 using Application.Models.Tag.DTO;
 using Application.Models.Tag.Response;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace API_Blog.Controllers.V1
 {
+    [EnableRateLimiting("CrudPolicy")]
     public class TagController : ApiController
     {
         private readonly ITagService _tagService;

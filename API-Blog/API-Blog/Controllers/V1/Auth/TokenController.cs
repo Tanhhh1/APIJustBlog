@@ -1,14 +1,15 @@
 ﻿using API_Blog.Controllers.Common;
 using Application.Common.ModelServices;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Services.Auth;
 using Application.Models.Auth.DTO;
 using Application.Models.Auth.Response;
-using Application.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace API_Blog.Controllers.V1.Auth
 {
+    [EnableRateLimiting("AuthPolicy")]
     public class TokenController : ApiController
     {
         private readonly ITokenService _tokenService;

@@ -1,9 +1,11 @@
-﻿using Application.Interfaces;
+﻿using Application.Exceptions;
+using Application.Interfaces.Services;
+using Application.Interfaces.UnitOfWork;
 using Application.Models.Post.DTO;
 using Application.Models.Post.Response;
-using Application.UnitOfWork;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Logger;
 
 namespace Application.Services
@@ -37,6 +39,12 @@ namespace Application.Services
         {
             try
             {
+                var isExist = await _unitOfWork.PostRepository.ExistsByUrlSlugAsync(createDTO.UrlSlug);
+                if (isExist)
+                {
+                    Logging.Warning("Post create failed: UrlSlug '{UrlSlug}' already exists", createDTO.UrlSlug);
+                    throw new BadRequestException("UrlSlug already exists.");
+                }
                 var create = _mapper.Map<Post>(createDTO);
                 create.PostedOn = DateTime.UtcNow;
                 await _unitOfWork.PostRepository.AddAsync(create);
@@ -55,6 +63,12 @@ namespace Application.Services
         {
             try
             {
+                var isExist = await _unitOfWork.PostRepository.ExistsByUrlSlugAsync(updateDTO.UrlSlug);
+                if (isExist)
+                {
+                    Logging.Warning("Post update failed: UrlSlug '{UrlSlug}' already exists", updateDTO.UrlSlug);
+                    throw new BadRequestException("UrlSlug already exists.");
+                }
                 var update = await _unitOfWork.PostRepository.GetByIdAsync(id);
                 if (update == null)
                     return new PostResponse { Ok = false };

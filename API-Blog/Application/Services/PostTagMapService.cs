@@ -1,6 +1,6 @@
 ﻿using Application.DTOs.PostTagMap;
-using Application.Interfaces;
-using Application.UnitOfWork;
+using Application.Interfaces.Services;
+using Application.Interfaces.UnitOfWork;
 using AutoMapper;
 using Domain.Entities;
 using Shared.Logger;

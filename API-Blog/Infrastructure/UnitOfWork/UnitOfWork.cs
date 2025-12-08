@@ -1,7 +1,7 @@
-﻿using Infrastructure.Interfaces;
+﻿using Application.Interfaces.UnitOfWork;
+using Application.Interfaces.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Application.UnitOfWork

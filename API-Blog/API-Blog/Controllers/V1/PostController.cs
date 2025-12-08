@@ -1,16 +1,16 @@
 ﻿using API_Blog.Controllers.Common;
 using Application.Common.ModelServices;
-using Application.Interfaces;
+using Application.Interfaces.Services;
 using Application.Models.Post.DTO;
 using Application.Models.Post.Response;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Shared.ClaimService;
-using Shared.Logger;
 
 namespace API_Blog.Controllers.V1
 {
+    [EnableRateLimiting("CrudPolicy")]
     public class PostController : ApiController
     {
         private readonly IPostService _postService;

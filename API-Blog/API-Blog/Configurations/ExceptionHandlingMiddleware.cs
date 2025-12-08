@@ -16,13 +16,22 @@ namespace API_Blog.Configurations
 
         public async Task Invoke(HttpContext httpContext)
         {
-            try
+            var correlationId = httpContext.Request.Headers.ContainsKey("X-Correlation-ID")
+            ? httpContext.Request.Headers["X-Correlation-ID"].ToString()
+            : Guid.NewGuid().ToString();
+
+            httpContext.Response.Headers["X-Correlation-ID"] = correlationId;
+
+            using (Serilog.Context.LogContext.PushProperty("CorrelationId", correlationId))
             {
-                await _next(httpContext);
-            }
-            catch (Exception ex)
-            {
-                await HandleException(httpContext, ex);
+                try
+                {
+                    await _next(httpContext);
+                }
+                catch (Exception ex)
+                {
+                    await HandleException(httpContext, ex);
+                }
             }
         }
 
@@ -45,8 +54,12 @@ namespace API_Blog.Configurations
             if (statusCode == StatusCodes.Status500InternalServerError)
             {
                 Logging.Error(ex, "Unhandled exception at {Path}", httpContext.Request.Path);
-                errors.Clear();
-                errors.Add("Server Error");
+                errors = new List<string> { "Server Error" };
+            }
+            else
+            {
+                Logging.Warning("Handled exception at {Path} StatusCode {StatusCode} Message {Message}",
+                    httpContext.Request.Path, statusCode, ex.Message);
             }
 
             var result = JsonSerializer.Serialize(ApiResult<string>.Failure(errors), new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });

@@ -1,8 +1,8 @@
-﻿using Application.Services;
-using Application.UnitOfWork;
+﻿using Application.Interfaces.UnitOfWork;
+using Application.Services;
 using AutoMapper;
 using Domain.Entities;
-using Infrastructure.Interfaces;
+using Application.Interfaces.Repositories;
 using Moq;
 using Test.Common;
 

@@ -1,16 +1,10 @@
-﻿using Application.DTOs.PostTagMap;
+﻿using Application.Interfaces.UnitOfWork;
 using Application.Services;
-using Application.UnitOfWork;
 using AutoMapper;
 using Domain.Entities;
-using Infrastructure.Interfaces;
+using Application.Interfaces.Repositories;
 using Moq;
 using Test.Common;
-using Xunit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Test.Application.Services
 {

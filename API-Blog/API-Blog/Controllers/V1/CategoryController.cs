@@ -1,13 +1,14 @@
 ﻿using API_Blog.Controllers.Common;
 using Application.Common.ModelServices;
-using Application.Interfaces;
+using Application.Interfaces.Services;
 using Application.Models.Category.DTO;
 using Application.Models.Category.Response;
-using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace API_Blog.Controllers.V1
 {
+    [EnableRateLimiting("CrudPolicy")]
     public class CategoryController : ApiController
     {
         private readonly ICategoryService _categoryService;
@@ -35,7 +36,7 @@ namespace API_Blog.Controllers.V1
         public async Task<IActionResult> GetByCateId(int id)
         {
             var category = await _categoryService.GetByCateIdAsync(id);
-            if (category == null) //khi service trả nullable DTO / Entity
+            if (category == null)
                 return NotFound(ApiResult<CategoryDTO>.Failure(new List<string> { "Category not found" }));
             return Ok(ApiResult<CategoryDTO>.Success(category));
         }
@@ -51,7 +52,7 @@ namespace API_Blog.Controllers.V1
         public async Task<IActionResult> UpdateCate([FromBody] CategorySaveDTO updateDTO, int id)
         {
             var update = await _categoryService.UpdateCateAsync(id, updateDTO);
-            if (!update.Ok) //khi service trả response object với property Ok
+            if (!update.Ok)
                 return NotFound(ApiResult<CategoryResponse>.Failure(new List<string> { "Category not found" }));
             return Ok(ApiResult<CategoryResponse>.Success(update));
         }

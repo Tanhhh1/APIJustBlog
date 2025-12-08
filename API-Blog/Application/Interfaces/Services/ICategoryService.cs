@@ -1,9 +1,8 @@
 ﻿using Application.Common.ModelServices;
 using Application.Models.Category.DTO;
 using Application.Models.Category.Response;
-using Domain.Entities;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.Services
 {
     public interface ICategoryService
     {

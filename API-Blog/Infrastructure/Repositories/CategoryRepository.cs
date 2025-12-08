@@ -1,5 +1,5 @@
 ﻿using Domain.Entities;
-using Infrastructure.Interfaces;
+using Application.Interfaces.Repositories;
 using Infrastructure.Persistence;
 using Infrastructure.Repositories.Common;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +13,11 @@ namespace Infrastructure.Repositories
             return await _dbContext.Set<Category>()
                 .Where(c => c.Name.Contains(keyword) || c.Description.Contains(keyword))
                 .ToListAsync();
+        }
+        public async Task<bool> ExistsByUrlSlugAsync(string urlSlug)
+        {
+            return await _dbContext.Categories
+                                 .AnyAsync(c => c.UrlSlug == urlSlug);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Application.Models.Auth.DTO;
 using Application.Models.Auth.Response;
 
-namespace Application.Interfaces.Auth;
+namespace Application.Interfaces.Services.Auth;
 
 public interface ITokenService
 {

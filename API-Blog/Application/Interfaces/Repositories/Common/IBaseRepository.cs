@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Infrastructure.Interfaces.Common
+namespace Application.Interfaces.Repositories.Common
 {
     public interface IBaseRepository<T> where T : class
     {

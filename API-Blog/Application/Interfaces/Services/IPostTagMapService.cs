@@ -1,7 +1,6 @@
-﻿
-using Application.DTOs.PostTagMap;
+﻿using Application.DTOs.PostTagMap;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.Services
 {
     public interface IPostTagMapService
     {

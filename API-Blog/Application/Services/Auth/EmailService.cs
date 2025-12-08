@@ -1,9 +1,10 @@
-﻿using Application.Interfaces.Auth;
+﻿using Application.Interfaces.Services.Auth;
 using Application.Models;
 using MailKit.Net.Smtp;
-using MimeKit;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
+using MimeKit;
+using Shared.Logger;
 
 namespace Application.Services.Auth
 {
@@ -29,17 +30,20 @@ namespace Application.Services.Auth
             };
 
             using var smtp = new SmtpClient();
+            try
+            {
+                await smtp.ConnectAsync(_settings.SmtpServer, _settings.Port, SecureSocketOptions.SslOnConnect);
+                await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
+                await smtp.SendAsync(email);
+                await smtp.DisconnectAsync(true);
 
-            await smtp.ConnectAsync(
-                _settings.SmtpServer,
-                _settings.Port,
-                SecureSocketOptions.SslOnConnect
-            );
-
-            await smtp.AuthenticateAsync(_settings.Username, _settings.Password);
-
-            await smtp.SendAsync(email);
-            await smtp.DisconnectAsync(true);
+                Logging.Info("Email sent successfully to {To} with subject '{Subject}'", message.To, message.Subject);
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "Failed to send email to {To}", message.To);
+                throw;
+            }
         }
     }
 

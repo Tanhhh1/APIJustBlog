@@ -1,4 +1,4 @@
-﻿using Infrastructure.Interfaces.Common;
+﻿using Application.Interfaces.Repositories.Common;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

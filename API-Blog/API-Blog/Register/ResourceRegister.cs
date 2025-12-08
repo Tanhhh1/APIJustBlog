@@ -1,8 +1,6 @@
 ﻿using Domain.Identity;
 using Infrastructure.Persistence;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.SignalR.Protocol;
-using Microsoft.Extensions.Options;
 using Shared.Constants;
 
 namespace API.Register;

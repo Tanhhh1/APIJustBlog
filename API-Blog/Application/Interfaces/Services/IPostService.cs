@@ -2,7 +2,7 @@
 using Application.Models.Post.DTO;
 using Application.Models.Post.Response;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.Services
 {
     public interface IPostService
     {

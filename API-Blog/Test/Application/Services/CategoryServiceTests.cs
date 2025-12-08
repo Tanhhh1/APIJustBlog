@@ -1,10 +1,8 @@
-﻿using Application.Models.Category.DTO;
-using Application.Models.Category.Response;
-using Application.UnitOfWork;
+﻿using Application.Interfaces.UnitOfWork;
+using Application.Services;
 using AutoMapper;
 using Domain.Entities;
-using Infrastructure.Interfaces;
-using Infrastructure.Services;
+using Application.Interfaces.Repositories;
 using Moq;
 using Test.Common;
 

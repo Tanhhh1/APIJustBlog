@@ -1,7 +1,7 @@
 ﻿using Application.Models;
 
 
-namespace Application.Interfaces.Auth
+namespace Application.Interfaces.Services.Auth
 {
     public interface IEmailService
     {

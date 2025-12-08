@@ -27,6 +27,8 @@ namespace API_Blog.Register
             services.IdentityInjection();
             services.JwtInjection(configuration);
 
+            services.AddRateLimitingPolicies();
+
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssembly(Assembly.Load("Application"));
 
@@ -38,6 +40,7 @@ namespace API_Blog.Register
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseRouting();
+            app.UseRateLimiter();
             app.UseCors(PolicyName);
             app.UseHttpsRedirection();
             app.UseAuthentication();

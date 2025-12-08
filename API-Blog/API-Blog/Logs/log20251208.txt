@@ -1,0 +1,480 @@
+2025-12-08 16:30:20.730 +07:00  DBG  Registered model binder providers, in the following order: ["Asp.Versioning.ApiVersionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ByteArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormFileModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FormCollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.KeyValuePairModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DictionaryModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ArrayModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CollectionModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ComplexObjectModelBinderProvider"]
+2025-12-08 16:30:21.497 +07:00  DBG  An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-12-08 16:30:21.604 +07:00  INF  User profile is available. Using 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-12-08 16:30:22.087 +07:00  DBG  The index {'PostId'} was not created on entity type 'PostTagMap' as the properties are already covered by the index {'PostId', 'TagId'}.
+2025-12-08 16:30:22.089 +07:00  DBG  The index {'UserId'} was not created on entity type 'AppUserRole' as the properties are already covered by the index {'UserId', 'RoleId'}.
+2025-12-08 16:30:22.090 +07:00  DBG  The index {'UserId'} was not created on entity type 'IdentityUserToken<Guid>' as the properties are already covered by the index {'UserId', 'LoginProvider', 'Name'}.
+2025-12-08 16:30:22.294 +07:00  DBG  Entity Framework Core 9.0.10 initialized 'DatabaseContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:9.0.10' with options: MigrationsAssembly=Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null EngineType=SqlServer 
+2025-12-08 16:30:22.506 +07:00  DBG  Compiling query expression: 
+'DbSet<AppRole>()
+    .Any()'
+2025-12-08 16:30:22.684 +07:00  DBG  Generated query execution expression: 
+'queryContext => SingleQueryingEnumerable.Create<bool>(
+    relationalQueryContext: (RelationalQueryContext)queryContext, 
+    relationalCommandResolver: parameters => [LIFTABLE Constant: RelationalCommandCache.QueryExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> 0
+        SELECT EXISTS (
+            SELECT 1
+            FROM AspNetRoles AS a)) | Resolver: c => new RelationalCommandCache(
+        c.Dependencies.MemoryCache, 
+        c.RelationalDependencies.QuerySqlGeneratorFactory, 
+        c.RelationalDependencies.RelationalParameterBasedSqlProcessorFactory, 
+        Projection Mapping:
+            EmptyProjectionMember -> 0
+        SELECT EXISTS (
+            SELECT 1
+            FROM AspNetRoles AS a), 
+        False, 
+        new HashSet<string>(
+            new string[]{ }, 
+            StringComparer.Ordinal
+        )
+    )].GetRelationalCommandTemplate(parameters), 
+    readerColumns: null, 
+    shaper: (queryContext, dataReader, resultContext, resultCoordinator) => 
+    {
+        bool? value1;
+        value1 = dataReader.IsDBNull(0) ? default(bool?) : (bool?)dataReader.GetBoolean(0);
+        return (bool)value1;
+    }, 
+    contextType: Infrastructure.Persistence.DatabaseContext, 
+    standAloneStateManager: False, 
+    detailedErrorsEnabled: False, 
+    threadSafetyChecksEnabled: True)
+    .Single()'
+2025-12-08 16:30:22.713 +07:00  DBG  Creating DbConnection.
+2025-12-08 16:30:22.734 +07:00  DBG  Created DbConnection. (19ms).
+2025-12-08 16:30:22.738 +07:00  DBG  Opening connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:30:23.326 +07:00  DBG  Opened connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:30:23.330 +07:00  DBG  Creating DbCommand for 'ExecuteReader'.
+2025-12-08 16:30:23.337 +07:00  DBG  Created DbCommand for 'ExecuteReader' (4ms).
+2025-12-08 16:30:23.341 +07:00  DBG  Initialized DbCommand for 'ExecuteReader' (10ms).
+2025-12-08 16:30:23.349 +07:00  DBG  Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [AspNetRoles] AS [a]) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+2025-12-08 16:30:23.386 +07:00  INF  Executed DbCommand (36ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [AspNetRoles] AS [a]) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+2025-12-08 16:30:23.396 +07:00  DBG  Closing data reader to 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:30:23.403 +07:00  DBG  A data reader for 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' is being disposed after spending 10ms reading results.
+2025-12-08 16:30:23.406 +07:00  DBG  Closing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:30:23.413 +07:00  DBG  Closed connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' (6ms).
+2025-12-08 16:30:23.416 +07:00  DBG  'DatabaseContext' disposed.
+2025-12-08 16:30:23.419 +07:00  DBG  Disposing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:30:23.421 +07:00  DBG  Disposed connection to database '' on server '' (1ms).
+2025-12-08 16:30:23.427 +07:00  DBG  Hosting starting
+2025-12-08 16:30:23.436 +07:00  DBG  Reading data from file 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys\key-3a3f5ba7-96ca-43ee-aa50-0baf947a8e30.xml'.
+2025-12-08 16:30:23.469 +07:00  DBG  Reading data from file 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys\key-8600f587-dc07-4d5b-bb2d-6f3e09633935.xml'.
+2025-12-08 16:30:23.487 +07:00  DBG  Reading data from file 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys\key-bcbbd09c-5d11-4ea7-a210-5a7b4541efa2.xml'.
+2025-12-08 16:30:23.505 +07:00  DBG  Reading data from file 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys\key-bf802ebd-f5d7-4dd0-a35d-d8f5ffbc0bc1.xml'.
+2025-12-08 16:30:23.525 +07:00  DBG  Reading data from file 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys\key-e60ff1e8-9769-4c99-9c41-530a7dbb1337.xml'.
+2025-12-08 16:30:23.543 +07:00  DBG  Reading data from file 'C:\Users\ADMIN\AppData\Local\ASP.NET\DataProtection-Keys\key-f5e67d02-4c24-4201-b8e7-897e61f0ba09.xml'.
+2025-12-08 16:30:23.572 +07:00  DBG  Found key {3a3f5ba7-96ca-43ee-aa50-0baf947a8e30}.
+2025-12-08 16:30:23.580 +07:00  DBG  Found key {8600f587-dc07-4d5b-bb2d-6f3e09633935}.
+2025-12-08 16:30:23.581 +07:00  DBG  Found key {bcbbd09c-5d11-4ea7-a210-5a7b4541efa2}.
+2025-12-08 16:30:23.582 +07:00  DBG  Found key {bf802ebd-f5d7-4dd0-a35d-d8f5ffbc0bc1}.
+2025-12-08 16:30:23.584 +07:00  DBG  Found key {e60ff1e8-9769-4c99-9c41-530a7dbb1337}.
+2025-12-08 16:30:23.585 +07:00  DBG  Found key {f5e67d02-4c24-4201-b8e7-897e61f0ba09}.
+2025-12-08 16:30:23.590 +07:00  DBG  Considering key {f5e67d02-4c24-4201-b8e7-897e61f0ba09} with expiration date 2026-01-12 16:45:30Z as default key.
+2025-12-08 16:30:23.596 +07:00  DBG  Forwarded activator type request from Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-12-08 16:30:23.598 +07:00  DBG  Decrypting secret element using Windows DPAPI.
+2025-12-08 16:30:23.601 +07:00  DBG  Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-12-08 16:30:23.603 +07:00  DBG  Opening CNG algorithm 'AES' from provider 'null' with chaining mode CBC.
+2025-12-08 16:30:23.606 +07:00  DBG  Opening CNG algorithm 'SHA256' from provider 'null' with HMAC.
+2025-12-08 16:30:23.612 +07:00  DBG  Using key {f5e67d02-4c24-4201-b8e7-897e61f0ba09} as the default key.
+2025-12-08 16:30:23.614 +07:00  DBG  Key ring with default key {f5e67d02-4c24-4201-b8e7-897e61f0ba09} was loaded during application startup.
+2025-12-08 16:30:23.620 +07:00  DBG  Middleware loaded
+2025-12-08 16:30:23.623 +07:00  DBG  Middleware loaded. Script /_framework/aspnetcore-browser-refresh.js (16501 B).
+2025-12-08 16:30:23.625 +07:00  DBG  Middleware loaded. Script /_framework/blazor-hotreload.js (799 B).
+2025-12-08 16:30:23.667 +07:00  WRN  The WebRootPath was not found: D:\C# .Net Core\Project\Just-Blog\API-Blog\API-Blog\wwwroot. Static files may be unavailable.
+2025-12-08 16:30:23.722 +07:00  DBG  Middleware loaded: DOTNET_MODIFIABLE_ASSEMBLIES=debug, __ASPNETCORE_BROWSER_TOOLS=true
+2025-12-08 16:30:23.789 +07:00  INF  Now listening on: http://[::]:5501
+2025-12-08 16:30:23.790 +07:00  DBG  Loaded hosting startup assembly API-Blog
+2025-12-08 16:30:23.791 +07:00  DBG  Loaded hosting startup assembly Microsoft.WebTools.ApiEndpointDiscovery
+2025-12-08 16:30:23.792 +07:00  DBG  Loaded hosting startup assembly Microsoft.AspNetCore.Watch.BrowserRefresh
+2025-12-08 16:30:23.793 +07:00  DBG  Loaded hosting startup assembly Microsoft.WebTools.BrowserLink.Net
+2025-12-08 16:30:23.902 +07:00  INF  Application started. Press Ctrl+C to shut down.
+2025-12-08 16:30:23.903 +07:00  INF  Hosting environment: Development
+2025-12-08 16:30:23.904 +07:00  INF  Content root path: D:\C# .Net Core\Project\Just-Blog\API-Blog\API-Blog
+2025-12-08 16:30:23.906 +07:00  DBG  Hosting started
+2025-12-08 16:30:24.051 +07:00  DBG  Connection id "0HNHM7HL2RKTN" received FIN.
+2025-12-08 16:30:24.059 +07:00  DBG  Connection id "0HNHM7HL2RKTN" accepted.
+2025-12-08 16:30:24.061 +07:00  DBG  Connection id "0HNHM7HL2RKTN" started.
+2025-12-08 16:30:24.069 +07:00  DBG  Connection id "0HNHM7HL2RKTN" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:30:24.073 +07:00  DBG  Connection id "0HNHM7HL2RKTN" disconnecting.
+2025-12-08 16:30:24.079 +07:00  DBG  Connection id "0HNHM7HL2RKTN" stopped.
+2025-12-08 16:30:24.333 +07:00  DBG  Connection id "0HNHM7HL2RKTO" accepted.
+2025-12-08 16:30:24.335 +07:00  DBG  Connection id "0HNHM7HL2RKTO" started.
+2025-12-08 16:30:24.336 +07:00  DBG  Connection id "0HNHM7HL2RKTP" accepted.
+2025-12-08 16:30:24.338 +07:00  DBG  Connection id "0HNHM7HL2RKTP" started.
+2025-12-08 16:30:24.371 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/swagger/index.html - null null
+2025-12-08 16:30:24.485 +07:00  DBG  Wildcard detected, all requests with hosts will be allowed.
+2025-12-08 16:30:24.522 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 DBG  No candidates found for the request path '/swagger/index.html'
+2025-12-08 16:30:24.525 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 DBG  Request did not match any endpoints
+2025-12-08 16:30:24.534 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 WRN  Failed to determine the https port for redirect.
+2025-12-08 16:30:25.445 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 DBG  AuthenticationScheme: Bearer was not authenticated.
+2025-12-08 16:30:25.449 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 DBG  The request path /swagger/index.html does not match an existing file
+2025-12-08 16:30:25.502 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 DBG  Response markup is scheduled to include Browser Link script injection.
+2025-12-08 16:30:25.504 +07:00 20411c74-218d-4730-92e7-6fa5417f0794 DBG  Response markup is scheduled to include browser refresh script injection.
+2025-12-08 16:30:25.520 +07:00  DBG  Response markup was updated to include Browser Link script injection.
+2025-12-08 16:30:25.522 +07:00  DBG  Response markup was updated to include browser refresh script injection.
+2025-12-08 16:30:25.525 +07:00  DBG  Connection id "0HNHM7HL2RKTQ" accepted.
+2025-12-08 16:30:25.525 +07:00  DBG  Connection id "0HNHM7HL2RKTO" completed keep alive response.
+2025-12-08 16:30:25.530 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/_framework/aspnetcore-browser-refresh.js - null null
+2025-12-08 16:30:25.534 +07:00  DBG  Connection id "0HNHM7HL2RKTQ" started.
+2025-12-08 16:30:25.538 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/swagger/index.html - 200 null text/html;charset=utf-8 1175.1516ms
+2025-12-08 16:30:25.539 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/_vs/browserLink - null null
+2025-12-08 16:30:25.540 +07:00  DBG  Script injected: /_framework/aspnetcore-browser-refresh.js
+2025-12-08 16:30:25.546 +07:00  DBG  Connection id "0HNHM7HL2RKTP" completed keep alive response.
+2025-12-08 16:30:25.547 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/_framework/aspnetcore-browser-refresh.js - 200 16501 application/javascript; charset=utf-8 22.0994ms
+2025-12-08 16:30:25.590 +07:00  DBG  Connection id "0HNHM7HL2RKTQ" completed keep alive response.
+2025-12-08 16:30:25.592 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/_vs/browserLink - 200 null text/javascript; charset=UTF-8 52.7493ms
+2025-12-08 16:30:25.703 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/swagger/v1/swagger.json - null null
+2025-12-08 16:30:25.706 +07:00 9fd4e675-52ac-4738-b7b4-9569f0d9fcf3 DBG  No candidates found for the request path '/swagger/v1/swagger.json'
+2025-12-08 16:30:25.707 +07:00 9fd4e675-52ac-4738-b7b4-9569f0d9fcf3 DBG  Request did not match any endpoints
+2025-12-08 16:30:25.710 +07:00 9fd4e675-52ac-4738-b7b4-9569f0d9fcf3 DBG  AuthenticationScheme: Bearer was not authenticated.
+2025-12-08 16:30:25.712 +07:00 9fd4e675-52ac-4738-b7b4-9569f0d9fcf3 DBG  The request path /swagger/v1/swagger.json does not match an existing file
+2025-12-08 16:30:25.735 +07:00  DBG  Connection id "0HNHM7HL2RKTQ" completed keep alive response.
+2025-12-08 16:30:25.736 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 33.9326ms
+2025-12-08 16:31:00.890 +07:00  DBG  Connection id "0HNHM7HL2RKTR" accepted.
+2025-12-08 16:31:00.891 +07:00  DBG  Connection id "0HNHM7HL2RKTR" started.
+2025-12-08 16:31:00.892 +07:00  DBG  Connection id "0HNHM7HL2RKTR" received FIN.
+2025-12-08 16:31:00.892 +07:00  DBG  Connection id "0HNHM7HL2RKTS" accepted.
+2025-12-08 16:31:00.899 +07:00  DBG  Connection id "0HNHM7HL2RKTR" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:00.900 +07:00  DBG  Connection id "0HNHM7HL2RKTS" started.
+2025-12-08 16:31:00.901 +07:00  DBG  Connection id "0HNHM7HL2RKTR" disconnecting.
+2025-12-08 16:31:00.904 +07:00  DBG  Connection id "0HNHM7HL2RKTR" stopped.
+2025-12-08 16:31:00.907 +07:00  DBG  Connection id "0HNHM7HL2RKTS" bad request data: "Detected a TLS handshake to an endpoint that does not have TLS enabled."
+Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Detected a TLS handshake to an endpoint that does not have TLS enabled.
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.GetUnknownMethodLength(ReadOnlySpan`1 span)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.ParseRequestLine(TRequestHandler handler, ReadOnlySpan`1 requestLine)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.ParseRequestLine(TRequestHandler handler, SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.TakeStartLine(SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.ParseRequest(SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.TryParseRequest(ReadResult result, Boolean& endConnection)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequestsAsync[TContext](IHttpApplication`1 application)
+2025-12-08 16:31:00.920 +07:00  DBG  Connection id "0HNHM7HL2RKTS" disconnecting.
+2025-12-08 16:31:00.921 +07:00  DBG  Connection id "0HNHM7HL2RKTS" stopped.
+2025-12-08 16:31:00.921 +07:00  DBG  Connection id "0HNHM7HL2RKTS" received FIN.
+2025-12-08 16:31:00.922 +07:00  DBG  Connection id "0HNHM7HL2RKTS" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:01.847 +07:00  DBG  Connection id "0HNHM7HL2RKTT" accepted.
+2025-12-08 16:31:01.847 +07:00  DBG  Connection id "0HNHM7HL2RKTT" received FIN.
+2025-12-08 16:31:01.849 +07:00  DBG  Connection id "0HNHM7HL2RKTT" started.
+2025-12-08 16:31:01.849 +07:00  DBG  Connection id "0HNHM7HL2RKTU" accepted.
+2025-12-08 16:31:01.856 +07:00  DBG  Connection id "0HNHM7HL2RKTT" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:01.858 +07:00  DBG  Connection id "0HNHM7HL2RKTU" started.
+2025-12-08 16:31:01.860 +07:00  DBG  Connection id "0HNHM7HL2RKTT" disconnecting.
+2025-12-08 16:31:01.861 +07:00  DBG  Connection id "0HNHM7HL2RKTU" bad request data: "Detected a TLS handshake to an endpoint that does not have TLS enabled."
+Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Detected a TLS handshake to an endpoint that does not have TLS enabled.
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.GetUnknownMethodLength(ReadOnlySpan`1 span)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.ParseRequestLine(TRequestHandler handler, ReadOnlySpan`1 requestLine)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.ParseRequestLine(TRequestHandler handler, SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.TakeStartLine(SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.ParseRequest(SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.TryParseRequest(ReadResult result, Boolean& endConnection)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequestsAsync[TContext](IHttpApplication`1 application)
+2025-12-08 16:31:01.862 +07:00  DBG  Connection id "0HNHM7HL2RKTT" stopped.
+2025-12-08 16:31:01.867 +07:00  DBG  Connection id "0HNHM7HL2RKTU" disconnecting.
+2025-12-08 16:31:01.867 +07:00  DBG  Connection id "0HNHM7HL2RKTU" received FIN.
+2025-12-08 16:31:01.868 +07:00  DBG  Connection id "0HNHM7HL2RKTU" stopped.
+2025-12-08 16:31:01.870 +07:00  DBG  Connection id "0HNHM7HL2RKTU" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:02.854 +07:00  DBG  Connection id "0HNHM7HL2RKTV" accepted.
+2025-12-08 16:31:02.854 +07:00  DBG  Connection id "0HNHM7HL2RKTV" received FIN.
+2025-12-08 16:31:02.855 +07:00  DBG  Connection id "0HNHM7HL2RKTV" started.
+2025-12-08 16:31:02.856 +07:00  DBG  Connection id "0HNHM7HL2RKU0" accepted.
+2025-12-08 16:31:02.857 +07:00  DBG  Connection id "0HNHM7HL2RKTV" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:02.858 +07:00  DBG  Connection id "0HNHM7HL2RKU0" started.
+2025-12-08 16:31:02.859 +07:00  DBG  Connection id "0HNHM7HL2RKTV" disconnecting.
+2025-12-08 16:31:02.861 +07:00  DBG  Connection id "0HNHM7HL2RKU0" bad request data: "Detected a TLS handshake to an endpoint that does not have TLS enabled."
+Microsoft.AspNetCore.Server.Kestrel.Core.BadHttpRequestException: Detected a TLS handshake to an endpoint that does not have TLS enabled.
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.GetUnknownMethodLength(ReadOnlySpan`1 span)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.ParseRequestLine(TRequestHandler handler, ReadOnlySpan`1 requestLine)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpParser`1.ParseRequestLine(TRequestHandler handler, SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.TakeStartLine(SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.ParseRequest(SequenceReader`1& reader)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.Http1Connection.TryParseRequest(ReadResult result, Boolean& endConnection)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequests[TContext](IHttpApplication`1 application)
+   at Microsoft.AspNetCore.Server.Kestrel.Core.Internal.Http.HttpProtocol.ProcessRequestsAsync[TContext](IHttpApplication`1 application)
+2025-12-08 16:31:02.861 +07:00  DBG  Connection id "0HNHM7HL2RKTV" stopped.
+2025-12-08 16:31:02.866 +07:00  DBG  Connection id "0HNHM7HL2RKU0" disconnecting.
+2025-12-08 16:31:02.867 +07:00  DBG  Connection id "0HNHM7HL2RKU0" received FIN.
+2025-12-08 16:31:02.868 +07:00  DBG  Connection id "0HNHM7HL2RKU0" stopped.
+2025-12-08 16:31:02.870 +07:00  DBG  Connection id "0HNHM7HL2RKU0" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:18.041 +07:00  DBG  Connection id "0HNHM7HL2RKU1" accepted.
+2025-12-08 16:31:18.042 +07:00  DBG  Connection id "0HNHM7HL2RKU1" received FIN.
+2025-12-08 16:31:18.043 +07:00  DBG  Connection id "0HNHM7HL2RKU1" started.
+2025-12-08 16:31:18.044 +07:00  DBG  Connection id "0HNHM7HL2RKU2" accepted.
+2025-12-08 16:31:18.045 +07:00  DBG  Connection id "0HNHM7HL2RKU1" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:18.046 +07:00  DBG  Connection id "0HNHM7HL2RKU2" started.
+2025-12-08 16:31:18.048 +07:00  DBG  Connection id "0HNHM7HL2RKU1" disconnecting.
+2025-12-08 16:31:18.049 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/api/v1/tag - null null
+2025-12-08 16:31:18.050 +07:00  DBG  Connection id "0HNHM7HL2RKU1" stopped.
+2025-12-08 16:31:18.060 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  1 candidate(s) found for the request path '/api/v1/tag'
+2025-12-08 16:31:18.062 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)' with route pattern 'api/v{v:apiVersion}/Tag' is valid for the request path '/api/v1/tag'
+2025-12-08 16:31:18.067 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Request matched endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:18.072 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  AuthenticationScheme: Bearer was not authenticated.
+2025-12-08 16:31:18.073 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Static files was skipped as the request already matched an endpoint.
+2025-12-08 16:31:18.075 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Static files was skipped as the request already matched an endpoint.
+2025-12-08 16:31:18.076 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 INF  Executing endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:18.094 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 INF  Route matched with {action = "GetAllTag", controller = "Tag"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllTag() on controller API_Blog.Controllers.V1.TagController (API-Blog).
+2025-12-08 16:31:18.097 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Execution plan of authorization filters (in the following order): ["None"]
+2025-12-08 16:31:18.098 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Execution plan of resource filters (in the following order): ["None"]
+2025-12-08 16:31:18.100 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)","Microsoft.AspNetCore.Mvc.Infrastructure.ModelStateInvalidFilter (Order: -2000)","Asp.Versioning.ReportApiVersionsAttribute (Order: 0)"]
+2025-12-08 16:31:18.101 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Execution plan of exception filters (in the following order): ["None"]
+2025-12-08 16:31:18.103 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Asp.Versioning.ReportApiVersionsAttribute (Order: 0)"]
+2025-12-08 16:31:18.106 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Executing controller factory for controller API_Blog.Controllers.V1.TagController (API-Blog)
+2025-12-08 16:31:18.193 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Executed controller factory for controller API_Blog.Controllers.V1.TagController (API-Blog)
+2025-12-08 16:31:18.237 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Entity Framework Core 9.0.10 initialized 'DatabaseContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:9.0.10' with options: MigrationsAssembly=Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null EngineType=SqlServer 
+2025-12-08 16:31:18.244 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Compiling query expression: 
+'DbSet<Tag>()'
+2025-12-08 16:31:18.286 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Generated query execution expression: 
+'queryContext => SingleQueryingEnumerable.Create<Tag>(
+    relationalQueryContext: (RelationalQueryContext)queryContext, 
+    relationalCommandResolver: parameters => [LIFTABLE Constant: RelationalCommandCache.QueryExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Tag.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Tag.CreatedOn (DateTime?), 1], [Property: Tag.Description (string) Required MaxLength(1000), 2], [Property: Tag.Name (string) Required MaxLength(255), 3], [Property: Tag.UpdatedOn (DateTime?), 4], [Property: Tag.UrlSlug (string) Required Index, 5] }
+        SELECT t.Id, t.CreatedOn, t.Description, t.Name, t.UpdatedOn, t.UrlSlug
+        FROM Tags AS t) | Resolver: c => new RelationalCommandCache(
+        c.Dependencies.MemoryCache, 
+        c.RelationalDependencies.QuerySqlGeneratorFactory, 
+        c.RelationalDependencies.RelationalParameterBasedSqlProcessorFactory, 
+        Projection Mapping:
+            EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Tag.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Tag.CreatedOn (DateTime?), 1], [Property: Tag.Description (string) Required MaxLength(1000), 2], [Property: Tag.Name (string) Required MaxLength(255), 3], [Property: Tag.UpdatedOn (DateTime?), 4], [Property: Tag.UrlSlug (string) Required Index, 5] }
+        SELECT t.Id, t.CreatedOn, t.Description, t.Name, t.UpdatedOn, t.UrlSlug
+        FROM Tags AS t, 
+        False, 
+        new HashSet<string>(
+            new string[]{ }, 
+            StringComparer.Ordinal
+        )
+    )].GetRelationalCommandTemplate(parameters), 
+    readerColumns: null, 
+    shaper: (queryContext, dataReader, resultContext, resultCoordinator) => 
+    {
+        Tag entity;
+        entity = 
+        {
+            MaterializationContext materializationContext1;
+            IEntityType entityType1;
+            Tag instance1;
+            InternalEntityEntry entry1;
+            bool hasNullKey1;
+            materializationContext1 = new MaterializationContext(
+                [LIFTABLE Constant: ValueBuffer | Resolver: _ => (object)ValueBuffer.Empty], 
+                queryContext.Context
+            );
+            instance1 = default(Tag);
+            entry1 = queryContext.TryGetEntry(
+                key: [LIFTABLE Constant: Key: Tag.Id PK | Resolver: c => c.Dependencies.Model.FindEntityType("Domain.Entities.Tag").FindPrimaryKey()], 
+                keyValues: new object[]{ (object)dataReader.GetInt32(0) }, 
+                throwOnNullKey: True, 
+                hasNullKey: hasNullKey1);
+            !(hasNullKey1) ? entry1 != default(InternalEntityEntry) ? 
+            {
+                entityType1 = entry1.EntityType;
+                return instance1 = (Tag)entry1.Entity;
+            } : 
+            {
+                ISnapshot shadowSnapshot1;
+                shadowSnapshot1 = [LIFTABLE Constant: Snapshot | Resolver: _ => Snapshot.Empty];
+                entityType1 = [LIFTABLE Constant: EntityType: Tag | Resolver: namelessParameter{0} => namelessParameter{0}.Dependencies.Model.FindEntityType("Domain.Entities.Tag")];
+                instance1 = switch (entityType1)
+                {
+                    case [LIFTABLE Constant: EntityType: Tag | Resolver: namelessParameter{1} => namelessParameter{1}.Dependencies.Model.FindEntityType("Domain.Entities.Tag")]: 
+                        {
+                            return 
+                            {
+                                Tag instance;
+                                instance = new Tag();
+                                instance.<Id>k__BackingField = dataReader.GetInt32(0);
+                                instance.<CreatedOn>k__BackingField = dataReader.IsDBNull(1) ? default(DateTime?) : (DateTime?)dataReader.GetDateTime(1);
+                                instance.<Description>k__BackingField = dataReader.GetString(2);
+                                instance.<Name>k__BackingField = dataReader.GetString(3);
+                                instance.<UpdatedOn>k__BackingField = dataReader.IsDBNull(4) ? default(DateTime?) : (DateTime?)dataReader.GetDateTime(4);
+                                instance.<UrlSlug>k__BackingField = dataReader.GetString(5);
+                                (instance is IInjectableService) ? ((IInjectableService)instance).Injected(
+                                    context: materializationContext1.Context, 
+                                    entity: instance, 
+                                    queryTrackingBehavior: TrackAll, 
+                                    structuralType: [LIFTABLE Constant: EntityType: Tag | Resolver: namelessParameter{2} => namelessParameter{2}.Dependencies.Model.FindEntityType("Domain.Entities.Tag")]) : default(void);
+                                return instance;
+                            }}
+                    default: 
+                        default(Tag)
+                }
+                ;
+                entry1 = entityType1 == default(IEntityType) ? default(InternalEntityEntry) : queryContext.StartTracking(
+                    entityType: entityType1, 
+                    entity: instance1, 
+                    snapshot: shadowSnapshot1);
+                return instance1;
+            } : default(void);
+            return instance1;
+        };
+        return entity;
+    }, 
+    contextType: Infrastructure.Persistence.DatabaseContext, 
+    standAloneStateManager: False, 
+    detailedErrorsEnabled: False, 
+    threadSafetyChecksEnabled: True)'
+2025-12-08 16:31:18.300 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Creating DbConnection.
+2025-12-08 16:31:18.301 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Created DbConnection. (1ms).
+2025-12-08 16:31:18.303 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Opening connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:18.307 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Opened connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:18.308 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Creating DbCommand for 'ExecuteReader'.
+2025-12-08 16:31:18.309 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Created DbCommand for 'ExecuteReader' (0ms).
+2025-12-08 16:31:18.310 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Initialized DbCommand for 'ExecuteReader' (1ms).
+2025-12-08 16:31:18.311 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[Id], [t].[CreatedOn], [t].[Description], [t].[Name], [t].[UpdatedOn], [t].[UrlSlug]
+FROM [Tags] AS [t]
+2025-12-08 16:31:18.339 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 INF  Executed DbCommand (28ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[Id], [t].[CreatedOn], [t].[Description], [t].[Name], [t].[UpdatedOn], [t].[UrlSlug]
+FROM [Tags] AS [t]
+2025-12-08 16:31:18.361 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:18.383 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:18.385 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:18.387 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:18.388 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:18.392 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Closing data reader to 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:18.393 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  A data reader for 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' is being disposed after spending 51ms reading results.
+2025-12-08 16:31:18.396 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Closing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:18.398 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Closed connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' (1ms).
+2025-12-08 16:31:18.414 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  List of registered output formatters, in the following order: ["Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-12-08 16:31:18.418 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  No information found on request to perform content negotiation.
+2025-12-08 16:31:18.419 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Attempting to select an output formatter without using a content type as no explicit content types were specified for the response.
+2025-12-08 16:31:18.420 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Attempting to select the first formatter in the output formatters list which can write the result.
+2025-12-08 16:31:18.422 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 DBG  Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-12-08 16:31:18.423 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 INF  Executing OkObjectResult, writing value of type 'Application.Common.ModelServices.ApiResult`1[[System.Collections.Generic.IEnumerable`1[[Application.Models.Tag.DTO.TagDTO, Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2025-12-08 16:31:18.435 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 INF  Executed action API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog) in 328.7544ms
+2025-12-08 16:31:18.438 +07:00 4675ae17-dfb1-4c91-8c74-f565eb7f3f79 INF  Executed endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:18.441 +07:00  DBG  Connection id "0HNHM7HL2RKU2" completed keep alive response.
+2025-12-08 16:31:18.443 +07:00  DBG  'DatabaseContext' disposed.
+2025-12-08 16:31:18.446 +07:00  DBG  Disposing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:18.448 +07:00  DBG  Disposed connection to database '' on server '' (1ms).
+2025-12-08 16:31:18.450 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/api/v1/tag - 200 null application/json; charset=utf-8 400.659ms
+2025-12-08 16:31:19.393 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/api/v1/tag - null null
+2025-12-08 16:31:19.397 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  1 candidate(s) found for the request path '/api/v1/tag'
+2025-12-08 16:31:19.399 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)' with route pattern 'api/v{v:apiVersion}/Tag' is valid for the request path '/api/v1/tag'
+2025-12-08 16:31:19.401 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Request matched endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:19.402 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  AuthenticationScheme: Bearer was not authenticated.
+2025-12-08 16:31:19.403 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Static files was skipped as the request already matched an endpoint.
+2025-12-08 16:31:19.403 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Static files was skipped as the request already matched an endpoint.
+2025-12-08 16:31:19.404 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa INF  Executing endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:19.405 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa INF  Route matched with {action = "GetAllTag", controller = "Tag"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllTag() on controller API_Blog.Controllers.V1.TagController (API-Blog).
+2025-12-08 16:31:19.407 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Execution plan of authorization filters (in the following order): ["None"]
+2025-12-08 16:31:19.408 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Execution plan of resource filters (in the following order): ["None"]
+2025-12-08 16:31:19.410 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)","Microsoft.AspNetCore.Mvc.Infrastructure.ModelStateInvalidFilter (Order: -2000)","Asp.Versioning.ReportApiVersionsAttribute (Order: 0)"]
+2025-12-08 16:31:19.413 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Execution plan of exception filters (in the following order): ["None"]
+2025-12-08 16:31:19.415 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Asp.Versioning.ReportApiVersionsAttribute (Order: 0)"]
+2025-12-08 16:31:19.417 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Executing controller factory for controller API_Blog.Controllers.V1.TagController (API-Blog)
+2025-12-08 16:31:19.421 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Executed controller factory for controller API_Blog.Controllers.V1.TagController (API-Blog)
+2025-12-08 16:31:19.430 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Entity Framework Core 9.0.10 initialized 'DatabaseContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:9.0.10' with options: MigrationsAssembly=Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null EngineType=SqlServer 
+2025-12-08 16:31:19.434 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Creating DbConnection.
+2025-12-08 16:31:19.434 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Created DbConnection. (0ms).
+2025-12-08 16:31:19.435 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Opening connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:19.436 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Opened connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:19.437 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Creating DbCommand for 'ExecuteReader'.
+2025-12-08 16:31:19.439 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Created DbCommand for 'ExecuteReader' (1ms).
+2025-12-08 16:31:19.440 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Initialized DbCommand for 'ExecuteReader' (2ms).
+2025-12-08 16:31:19.441 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[Id], [t].[CreatedOn], [t].[Description], [t].[Name], [t].[UpdatedOn], [t].[UrlSlug]
+FROM [Tags] AS [t]
+2025-12-08 16:31:19.444 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa INF  Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[Id], [t].[CreatedOn], [t].[Description], [t].[Name], [t].[UpdatedOn], [t].[UrlSlug]
+FROM [Tags] AS [t]
+2025-12-08 16:31:19.447 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:19.448 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:19.449 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:19.450 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:19.451 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:19.452 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Closing data reader to 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:19.453 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  A data reader for 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' is being disposed after spending 6ms reading results.
+2025-12-08 16:31:19.454 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Closing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:19.455 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Closed connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' (1ms).
+2025-12-08 16:31:19.458 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  List of registered output formatters, in the following order: ["Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-12-08 16:31:19.460 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  No information found on request to perform content negotiation.
+2025-12-08 16:31:19.460 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Attempting to select an output formatter without using a content type as no explicit content types were specified for the response.
+2025-12-08 16:31:19.461 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Attempting to select the first formatter in the output formatters list which can write the result.
+2025-12-08 16:31:19.462 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa DBG  Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-12-08 16:31:19.463 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa INF  Executing OkObjectResult, writing value of type 'Application.Common.ModelServices.ApiResult`1[[System.Collections.Generic.IEnumerable`1[[Application.Models.Tag.DTO.TagDTO, Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2025-12-08 16:31:19.465 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa INF  Executed action API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog) in 47.7246ms
+2025-12-08 16:31:19.466 +07:00 353dafc5-44f4-4894-9c3e-fcf00dbe68aa INF  Executed endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:19.467 +07:00  DBG  Connection id "0HNHM7HL2RKU2" completed keep alive response.
+2025-12-08 16:31:19.468 +07:00  DBG  'DatabaseContext' disposed.
+2025-12-08 16:31:19.468 +07:00  DBG  Disposing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:19.469 +07:00  DBG  Disposed connection to database '' on server '' (0ms).
+2025-12-08 16:31:19.470 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/api/v1/tag - 200 null application/json; charset=utf-8 76.892ms
+2025-12-08 16:31:20.270 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/api/v1/tag - null null
+2025-12-08 16:31:20.273 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  1 candidate(s) found for the request path '/api/v1/tag'
+2025-12-08 16:31:20.275 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)' with route pattern 'api/v{v:apiVersion}/Tag' is valid for the request path '/api/v1/tag'
+2025-12-08 16:31:20.276 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Request matched endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:20.277 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  AuthenticationScheme: Bearer was not authenticated.
+2025-12-08 16:31:20.278 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Static files was skipped as the request already matched an endpoint.
+2025-12-08 16:31:20.279 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Static files was skipped as the request already matched an endpoint.
+2025-12-08 16:31:20.279 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 INF  Executing endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:20.280 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 INF  Route matched with {action = "GetAllTag", controller = "Tag"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetAllTag() on controller API_Blog.Controllers.V1.TagController (API-Blog).
+2025-12-08 16:31:20.282 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Execution plan of authorization filters (in the following order): ["None"]
+2025-12-08 16:31:20.283 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Execution plan of resource filters (in the following order): ["None"]
+2025-12-08 16:31:20.285 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)","Microsoft.AspNetCore.Mvc.Infrastructure.ModelStateInvalidFilter (Order: -2000)","Asp.Versioning.ReportApiVersionsAttribute (Order: 0)"]
+2025-12-08 16:31:20.287 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Execution plan of exception filters (in the following order): ["None"]
+2025-12-08 16:31:20.288 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Asp.Versioning.ReportApiVersionsAttribute (Order: 0)"]
+2025-12-08 16:31:20.290 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Executing controller factory for controller API_Blog.Controllers.V1.TagController (API-Blog)
+2025-12-08 16:31:20.293 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Executed controller factory for controller API_Blog.Controllers.V1.TagController (API-Blog)
+2025-12-08 16:31:20.295 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Entity Framework Core 9.0.10 initialized 'DatabaseContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:9.0.10' with options: MigrationsAssembly=Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null EngineType=SqlServer 
+2025-12-08 16:31:20.298 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Creating DbConnection.
+2025-12-08 16:31:20.299 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Created DbConnection. (0ms).
+2025-12-08 16:31:20.300 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Opening connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:20.301 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Opened connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:20.302 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Creating DbCommand for 'ExecuteReader'.
+2025-12-08 16:31:20.303 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Created DbCommand for 'ExecuteReader' (0ms).
+2025-12-08 16:31:20.304 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Initialized DbCommand for 'ExecuteReader' (1ms).
+2025-12-08 16:31:20.305 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Executing DbCommand [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[Id], [t].[CreatedOn], [t].[Description], [t].[Name], [t].[UpdatedOn], [t].[UrlSlug]
+FROM [Tags] AS [t]
+2025-12-08 16:31:20.308 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 INF  Executed DbCommand (3ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT [t].[Id], [t].[CreatedOn], [t].[Description], [t].[Name], [t].[UpdatedOn], [t].[UrlSlug]
+FROM [Tags] AS [t]
+2025-12-08 16:31:20.311 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:20.312 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:20.313 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:20.315 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:20.316 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Context 'DatabaseContext' started tracking 'Tag' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-12-08 16:31:20.317 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Closing data reader to 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:20.318 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  A data reader for 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' is being disposed after spending 7ms reading results.
+2025-12-08 16:31:20.320 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Closing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:20.321 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Closed connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS' (1ms).
+2025-12-08 16:31:20.323 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  List of registered output formatters, in the following order: ["Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-12-08 16:31:20.324 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  No information found on request to perform content negotiation.
+2025-12-08 16:31:20.325 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Attempting to select an output formatter without using a content type as no explicit content types were specified for the response.
+2025-12-08 16:31:20.326 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Attempting to select the first formatter in the output formatters list which can write the result.
+2025-12-08 16:31:20.327 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 DBG  Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-12-08 16:31:20.329 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 INF  Executing OkObjectResult, writing value of type 'Application.Common.ModelServices.ApiResult`1[[System.Collections.Generic.IEnumerable`1[[Application.Models.Tag.DTO.TagDTO, Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=8.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2025-12-08 16:31:20.330 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 INF  Executed action API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog) in 40.0934ms
+2025-12-08 16:31:20.331 +07:00 effe747b-8c02-4b0b-bbf6-d833bdc3d8b7 INF  Executed endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:20.332 +07:00  DBG  Connection id "0HNHM7HL2RKU2" completed keep alive response.
+2025-12-08 16:31:20.333 +07:00  DBG  'DatabaseContext' disposed.
+2025-12-08 16:31:20.334 +07:00  DBG  Disposing connection to database 'JustBlog' on server 'DESKTOP-D1TJ1DB\SQLEXPRESS'.
+2025-12-08 16:31:20.335 +07:00  DBG  Disposed connection to database '' on server '' (1ms).
+2025-12-08 16:31:20.337 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/api/v1/tag - 200 null application/json; charset=utf-8 66.9114ms
+2025-12-08 16:31:21.068 +07:00  INF  Request starting HTTP/1.1 GET http://localhost:5501/api/v1/tag - null null
+2025-12-08 16:31:21.071 +07:00 ef7499d3-aad1-44e1-aed9-0b06cbdae970 DBG  1 candidate(s) found for the request path '/api/v1/tag'
+2025-12-08 16:31:21.072 +07:00 ef7499d3-aad1-44e1-aed9-0b06cbdae970 DBG  Endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)' with route pattern 'api/v{v:apiVersion}/Tag' is valid for the request path '/api/v1/tag'
+2025-12-08 16:31:21.073 +07:00 ef7499d3-aad1-44e1-aed9-0b06cbdae970 DBG  Request matched endpoint 'API_Blog.Controllers.V1.TagController.GetAllTag (API-Blog)'
+2025-12-08 16:31:21.075 +07:00 ef7499d3-aad1-44e1-aed9-0b06cbdae970 DBG  Rate limits exceeded, rejecting this request.
+2025-12-08 16:31:21.080 +07:00  DBG  Connection id "0HNHM7HL2RKU2" completed keep alive response.
+2025-12-08 16:31:21.081 +07:00  INF  Request finished HTTP/1.1 GET http://localhost:5501/api/v1/tag - 429 null application/json 12.9958ms
+2025-12-08 16:31:25.018 +07:00  DBG  Connection id "0HNHM7HL2RKU2" received FIN.
+2025-12-08 16:31:25.020 +07:00  DBG  Connection id "0HNHM7HL2RKU2" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-12-08 16:31:25.022 +07:00  DBG  Connection id "0HNHM7HL2RKU2" disconnecting.
+2025-12-08 16:31:25.038 +07:00  DBG  Connection id "0HNHM7HL2RKU2" stopped.

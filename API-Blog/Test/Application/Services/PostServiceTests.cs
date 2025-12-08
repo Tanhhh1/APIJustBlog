@@ -1,10 +1,8 @@
-﻿using Application.Models.Post.DTO;
-using Application.Models.Post.Response;
+﻿using Application.Interfaces.UnitOfWork;
 using Application.Services;
-using Application.UnitOfWork;
 using AutoMapper;
 using Domain.Entities;
-using Infrastructure.Interfaces;
+using Application.Interfaces.Repositories;
 using Moq;
 using Test.Common;
 

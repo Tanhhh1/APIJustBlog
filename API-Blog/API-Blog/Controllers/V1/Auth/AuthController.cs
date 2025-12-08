@@ -1,12 +1,15 @@
 ﻿using API_Blog.Controllers.Common;
 using Application.Common.ModelServices;
+using Application.Interfaces.Services.Auth;
 using Application.Models.Auth.DTO;
 using Application.Models.Auth.Response;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace API_Blog.Controllers.V1.Auth
 {
+    [EnableRateLimiting("AuthPolicy")]
     public class AuthController : ApiController
     {
         private readonly IAuthService _authService;
@@ -46,9 +49,9 @@ namespace API_Blog.Controllers.V1.Auth
         [HttpPost("verify-otp")]
         [ProducesResponseType(typeof(ApiResult<TokenResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResult<string>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> VerifyTwoFactorOtp(string username, string otp)
+        public async Task<IActionResult> VerifyTwoFactorOtp([FromBody] VerifyOtpDTO request)
         {
-            var result = await _authService.VerifyTwoFactorOtpAsync(username, otp);
+            var result = await _authService.VerifyTwoFactorOtpAsync(request);
             return Ok(ApiResult<TokenResponse>.Success(result));
         }
     }

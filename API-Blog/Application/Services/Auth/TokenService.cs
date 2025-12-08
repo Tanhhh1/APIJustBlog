@@ -1,8 +1,8 @@
 ﻿using Application.Exceptions;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Services.Auth;
+using Application.Interfaces.UnitOfWork;
 using Application.Models.Auth.DTO;
 using Application.Models.Auth.Response;
-using Application.UnitOfWork;
 using Domain.Entities;
 using Domain.Identity;
 using Microsoft.AspNetCore.Identity;

@@ -1,13 +1,14 @@
 ﻿using Application.Common.ModelServices;
-using Application.Interfaces;
+using Application.Exceptions;
+using Application.Interfaces.Services;
 using Application.Models.Category.DTO;
 using Application.Models.Category.Response;
-using Application.UnitOfWork;
+using Application.Interfaces.UnitOfWork;
 using AutoMapper;
 using Domain.Entities;
 using Shared.Logger;
 
-namespace Infrastructure.Services
+namespace Application.Services
 {
     public class CategoryService : ICategoryService
     {
@@ -48,6 +49,12 @@ namespace Infrastructure.Services
         {
             try
             {
+                var isExist = await _unitOfWork.CategoryRepository.ExistsByUrlSlugAsync(createDTO.UrlSlug);
+                if (isExist)
+                {
+                    Logging.Warning("Category create failed: UrlSlug '{UrlSlug}' already exists", createDTO.UrlSlug);
+                    throw new BadRequestException("UrlSlug already exists.");
+                }
                 var create = _mapper.Map<Category>(createDTO);
                 await _unitOfWork.CategoryRepository.AddAsync(create);
                 await _unitOfWork.CompleteAsync();
@@ -65,6 +72,12 @@ namespace Infrastructure.Services
         {
             try
             {
+                var isExist = await _unitOfWork.CategoryRepository.ExistsByUrlSlugAsync(updateDTO.UrlSlug);
+                if (isExist)
+                {
+                    Logging.Warning("Category update failed: UrlSlug '{UrlSlug}' already exists", updateDTO.UrlSlug);
+                    throw new BadRequestException("UrlSlug already exists.");
+                }
                 var update = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
                 if (update == null) return new CategoryResponse { Ok = false };
                 _mapper.Map(updateDTO, update);

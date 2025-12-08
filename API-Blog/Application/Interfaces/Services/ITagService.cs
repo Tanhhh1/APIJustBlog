@@ -1,7 +1,7 @@
 ﻿using Application.Models.Tag.DTO;
 using Application.Models.Tag.Response;
 
-namespace Application.Interfaces
+namespace Application.Interfaces.Services
 {
     public interface ITagService
     {

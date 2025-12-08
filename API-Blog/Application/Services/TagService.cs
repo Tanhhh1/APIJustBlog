@@ -1,9 +1,11 @@
-﻿using Application.Interfaces;
+﻿using Application.Exceptions;
+using Application.Interfaces.Services;
+using Application.Interfaces.UnitOfWork;
 using Application.Models.Tag.DTO;
 using Application.Models.Tag.Response;
-using Application.UnitOfWork;
 using AutoMapper;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Logger;
 
 namespace Application.Services
@@ -36,6 +38,12 @@ namespace Application.Services
         {
             try
             {
+                var isExist = await _unitOfWork.TagRepository.ExistsByUrlSlugAsync(createDTO.UrlSlug);
+                if (isExist)
+                {
+                    Logging.Warning("Tag create failed: UrlSlug '{UrlSlug}' already exists", createDTO.UrlSlug);
+                    throw new BadRequestException("UrlSlug already exists.");
+                }
                 var create = _mapper.Map<Tag>(createDTO);
                 await _unitOfWork.TagRepository.AddAsync(create);
                 await _unitOfWork.CompleteAsync();
@@ -52,6 +60,12 @@ namespace Application.Services
         {
             try
             {
+                var isExist = await _unitOfWork.TagRepository.ExistsByUrlSlugAsync(updateDTO.UrlSlug);
+                if (isExist)
+                {
+                    Logging.Warning("Tag update failed: UrlSlug '{UrlSlug}' already exists", updateDTO.UrlSlug);
+                    throw new BadRequestException("UrlSlug already exists.");
+                }
                 var update = await _unitOfWork.TagRepository.GetByIdAsync(id);
                 if (update == null) return new TagResponse { Ok = false };
                 _mapper.Map(updateDTO, update);
