@@ -1,12 +1,14 @@
-﻿using Application.Interfaces.Services;
+﻿using Application.Interfaces.Repositories;
+using Application.Interfaces.Security;
+using Application.Interfaces.Services;
 using Application.Interfaces.Services.Auth;
 using Application.Interfaces.UnitOfWork;
 using Application.Models;
 using Application.Services;
 using Application.Services.Auth;
 using Application.UnitOfWork;
-using Application.Interfaces.Repositories;
 using Infrastructure.Repositories;
+using Infrastructure.Security;
 using Shared.ClaimService;
 
 
@@ -22,6 +24,7 @@ namespace API_Blog.Register
             services.Configure<EmailSetting>(configuration.GetSection("EmailConfiguration"));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IEncryptionService, AesEncryptionService>();
 
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<ITagService, TagService>();

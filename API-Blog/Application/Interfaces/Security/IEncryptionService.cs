@@ -1,6 +1,8 @@
 ﻿namespace Application.Interfaces.Security
 {
-    internal class IEncryptionService
+    public interface IEncryptionService
     {
+        string Encrypt(string plainText);
+        string Decrypt(string cipherText);
     }
 }

@@ -14,7 +14,7 @@ namespace API_Blog.Register
             {
                 options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
                     RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: httpContext.User.Identity?.Name ?? "anonymous",
+                        partitionKey: httpContext.User.Identity?.Name ?? "guest",
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 2000,
@@ -25,7 +25,7 @@ namespace API_Blog.Register
 
                 options.AddPolicy("CrudPolicy", httpContext =>
                 {
-                    var key = $"{httpContext.User.Identity?.Name ?? "anonymous"}:{httpContext.Request.Path}";
+                    var key = $"{httpContext.User.Identity?.Name ?? "guest"}:{httpContext.Request.Path}";
                     return RateLimitPartition.GetTokenBucketLimiter(key, _ => new TokenBucketRateLimiterOptions
                     {
                         TokenLimit = 100,
