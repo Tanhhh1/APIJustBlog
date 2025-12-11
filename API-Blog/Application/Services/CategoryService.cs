@@ -25,32 +25,48 @@ namespace Application.Services
         }
         public async Task<PageList<CategoryDTO>> GetAllCateAsync(int pageNumber, int pageSize)
         {
-            var categories = await _unitOfWork.CategoryRepository.GetAllAsync();
-            var count = categories.Count();
-            if (pageSize <= 0)
+            try
             {
-                pageSize = count == 0 ? 1 : count;
+                var categories = await _unitOfWork.CategoryRepository.GetAllAsync();
+                var count = categories.Count();
+                if (pageSize <= 0)
+                {
+                    pageSize = count == 0 ? 1 : count;
+                }
+                if (pageNumber < 1) pageNumber = 1;
+                var pagedItems = categories.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+                foreach (var category in pagedItems)
+                {
+                    category.UrlSlug = _crypto.Decrypt(category.UrlSlug);
+                }
+                var dtoItems = _mapper.Map<IEnumerable<CategoryDTO>>(pagedItems);
+                return new PageList<CategoryDTO>(dtoItems, count, pageNumber, pageSize);
             }
-            if (pageNumber < 1) pageNumber = 1;
-            var pagedItems = categories.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-            foreach (var category in pagedItems)
+            catch (Exception ex)
             {
-                category.UrlSlug = _crypto.Decrypt(category.UrlSlug);
+                Logging.Error(ex, "Error retrieving categories. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
-            var dtoItems = _mapper.Map<IEnumerable<CategoryDTO>>(pagedItems);
-            return new PageList<CategoryDTO>(dtoItems, count, pageNumber, pageSize);
         }
 
         public async Task<CategoryDTO?> GetByCateIdAsync(int id)
         {
-            var category = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
-            category.UrlSlug = _crypto.Decrypt(category.UrlSlug);
-            if (category == null)
+            try
             {
-                Logging.Warning("Category with ID {CategoryId} not found", id);
-                return null;
+                var category = await _unitOfWork.CategoryRepository.GetByIdAsync(id);
+                if (category == null)
+                {
+                    Logging.Warning("Category with ID {CategoryId} not found", id);
+                    return null;
+                }
+                category.UrlSlug = _crypto.Decrypt(category.UrlSlug);
+                return _mapper.Map<CategoryDTO?>(category);
             }
-            return _mapper.Map<CategoryDTO?>(category);
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "Error retrieving category with ID {CategoryId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
+            }
         }  
         public async Task<CategoryResponse> CreateCateAsync(CategorySaveDTO createDTO)
         {
@@ -73,8 +89,8 @@ namespace Application.Services
             }
             catch (Exception ex) 
             {
-                Logging.Error(ex, "Error creating category");
-                throw;
+                Logging.Error(ex, "Error creating category. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<CategoryResponse> UpdateCateAsync(int id, CategorySaveDTO updateDTO)
@@ -101,8 +117,8 @@ namespace Application.Services
             }
             catch (Exception ex) 
             {
-                Logging.Error(ex, "Error updating category with ID {CategoryId}", id);
-                throw;
+                Logging.Error(ex,"Error updating category with ID {CategoryId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<CategoryResponse> DeleteCateAsync(int id)
@@ -119,8 +135,8 @@ namespace Application.Services
             }
             catch (Exception ex) 
             {
-                Logging.Error(ex, "Error deleting category with ID {CategoryId}", id);
-                throw;
+                Logging.Error(ex, "Error deleting category with ID {CategoryId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<IEnumerable<CategoryResponse>> SearchAsync(string keyword)

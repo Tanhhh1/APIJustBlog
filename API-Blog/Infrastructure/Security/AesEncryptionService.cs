@@ -62,7 +62,7 @@ namespace Infrastructure.Security
                 throw new InvalidOperationException("Decryption failed: data may have been tampered with.");
             }
 
-            return Encoding.UTF8.GetString(plainText);
+            return Encoding.UTF8.GetString(plain);
         }
     }
 }

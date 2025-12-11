@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Interfaces\Caching\" />
     <Folder Include="Models\Post\DTO\" />
     <Folder Include="Models\Post\Response\" />
   </ItemGroup>

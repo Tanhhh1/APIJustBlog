@@ -1,6 +1,7 @@
 ﻿using Application.Exceptions;
 using Application.Interfaces.Services;
 using Application.Interfaces.UnitOfWork;
+using Application.Models.Post.DTO;
 using Application.Models.Tag.DTO;
 using Application.Models.Tag.Response;
 using AutoMapper;
@@ -22,17 +23,33 @@ namespace Application.Services
         }
         public async Task<IEnumerable<TagDTO>> GetAllTagAsync()
         {
-            return _mapper.Map<IEnumerable<TagDTO>>(await _unitOfWork.TagRepository.GetAllAsync());
+            try
+            {
+                return _mapper.Map<IEnumerable<TagDTO>>(await _unitOfWork.TagRepository.GetAllAsync());
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "Error retrieving tags. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
+            }
         }
         public async Task<TagDTO?> GetByTagIdAsync(int id)
         {
-            var tag = await _unitOfWork.TagRepository.GetByIdAsync(id);
-            if(tag == null)
+            try
             {
-                Logging.Warning("Tag with ID {TagId} not found", id);
-                return null;
+                var tag = await _unitOfWork.TagRepository.GetByIdAsync(id);
+                if (tag == null)
+                {
+                    Logging.Warning("Tag with ID {TagId} not found", id);
+                    return null;
+                }
+                return _mapper.Map<TagDTO?>(tag);
             }
-            return _mapper.Map<TagDTO?>(tag); 
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "Error retrieving tag with ID {TagId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
+            }
         }
         public async Task<TagResponse> CreateTagAsync(TagSaveDTO createDTO)
         {
@@ -52,8 +69,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error creating tag");
-                throw;
+                Logging.Error(ex, "Error creating tag. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<TagResponse> UpdateTagAsync(int id, TagSaveDTO updateDTO)
@@ -76,8 +93,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error updating tag with ID {TagId}", id);
-                throw;
+                Logging.Error(ex, "Error updating tag with ID {TagId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<TagResponse> DeleteTagAsync(int id)
@@ -93,8 +110,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error deleting tag with ID {TagId}", id);
-                throw;
+                Logging.Error(ex, "Error deleting tag with ID {TagId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
     }

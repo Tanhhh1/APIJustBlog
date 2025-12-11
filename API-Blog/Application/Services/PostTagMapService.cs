@@ -1,4 +1,5 @@
 ﻿using Application.DTOs.PostTagMap;
+using Application.Exceptions;
 using Application.Interfaces.Services;
 using Application.Interfaces.UnitOfWork;
 using AutoMapper;
@@ -44,21 +45,29 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error creating link for post");
-                throw;
+                Logging.Error(ex, "Error creating link for post. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<PostTagMapResponse?> GetLinkByIdAsync(int id)
         {
-            var post = await _unitOfWork.PostRepository.GetByIdAsync(id);
-            if (post == null)
+            try
             {
-                Logging.Warning("Post with ID {PostId} not found", id);
-                return null;
+                var post = await _unitOfWork.PostRepository.GetByIdAsync(id);
+                if (post == null)
+                {
+                    Logging.Warning("Post with ID {PostId} not found", id);
+                    return null;
+                }
+                var maps = await _unitOfWork.PostTagMapRepository.GetByPostIdAsync(id);
+                if (!maps.Any()) return null;
+                return _mapper.Map<PostTagMapResponse>(maps);
             }
-            var maps = await _unitOfWork.PostTagMapRepository.GetByPostIdAsync(id);
-            if (!maps.Any()) return null;
-            return _mapper.Map<PostTagMapResponse>(maps);
+            catch(Exception ex)
+            {
+                Logging.Error(ex, "Error retrieving link for post with ID {PostId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
+            }
         }
         public async Task<PostTagMapResponse?> DeleteLinkAsync(int postId, int tagId)
         {
@@ -78,8 +87,8 @@ namespace Application.Services
             }
             catch(Exception ex)
             {
-                Logging.Error(ex, "Error deleting link for post {PostId} - tag {TagId}", postId, tagId);
-                throw;
+                Logging.Error(ex, "Error deleting link for post {PostId} - tag {TagId}. Message: {Message}\nStackTrace: {StackTrace}", postId, tagId, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
     }

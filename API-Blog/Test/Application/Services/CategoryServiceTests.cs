@@ -5,6 +5,7 @@ using Domain.Entities;
 using Application.Interfaces.Repositories;
 using Moq;
 using Test.Common;
+using Application.Interfaces.Security;
 
 namespace Test.Application.Services
 {
@@ -13,6 +14,7 @@ namespace Test.Application.Services
         private readonly IMapper _mapper;
         private readonly Mock<ICategoryRepository> _mockCategoryRepo;
         private readonly Mock<IUnitOfWork> _mockUow;
+        private readonly Mock<IEncryptionService> _mockEncrypt;
         private readonly CategoryService _categoryService;
 
         public CategoryServiceTests()
@@ -24,10 +26,11 @@ namespace Test.Application.Services
             _mapper = mapperConfig.CreateMapper();
             _mockCategoryRepo = new Mock<ICategoryRepository>();
             _mockUow = new Mock<IUnitOfWork>();
+            _mockEncrypt = new Mock<IEncryptionService>();
             _mockUow.Setup(u => u.CategoryRepository).Returns(_mockCategoryRepo.Object);
             _mockUow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
 
-            _categoryService = new CategoryService(_mockUow.Object, _mapper);
+            _categoryService = new CategoryService(_mockUow.Object, _mapper, _mockEncrypt.Object);
         }
 
         [Fact]

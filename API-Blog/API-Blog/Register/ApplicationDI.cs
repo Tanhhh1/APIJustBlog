@@ -6,9 +6,9 @@ using Application.Interfaces.UnitOfWork;
 using Application.Models;
 using Application.Services;
 using Application.Services.Auth;
-using Application.UnitOfWork;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
+using Infrastructure.UnitOfWork;
 using Shared.ClaimService;
 
 

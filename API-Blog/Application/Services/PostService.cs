@@ -22,18 +22,34 @@ namespace Application.Services
         }
         public async Task<IEnumerable<PostDTO>> GetAllPostAsync()
         {
-            var posts = await _unitOfWork.PostRepository.GetAllAsync();
-            return _mapper.Map<IEnumerable<PostDTO>>(posts);
+            try
+            {
+                var posts = await _unitOfWork.PostRepository.GetAllAsync();
+                return _mapper.Map<IEnumerable<PostDTO>>(posts);
+            }
+            catch (Exception ex)
+            {
+                Logging.Error(ex, "Error retrieving posts. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
+            }
         }
         public async Task<PostDTO?> GetByPostIdAsync(int id)
         {
-            var post = await _unitOfWork.PostRepository.GetByIdAsync(id);
-            if (post == null)
+            try
             {
-                Logging.Warning("Post with ID {PostId} not found", id);
-                return null;
+                var post = await _unitOfWork.PostRepository.GetByIdAsync(id);
+                if (post == null)
+                {
+                    Logging.Warning("Post with ID {PostId} not found", id);
+                    return null;
+                }
+                return _mapper.Map<PostDTO?>(post);
             }
-            return _mapper.Map<PostDTO?>(post);
+            catch(Exception ex)
+            {
+                Logging.Error(ex, "Error retrieving post with ID {PostId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
+            }
         }
         public async Task<PostResponse> CreatePostAsync(PostSaveDTO createDTO, Guid userId)
         {
@@ -55,8 +71,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "User {UserId} failed to create post", userId);
-                throw;
+                Logging.Error(ex, "Error creating post. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<PostResponse> UpdatePostAsync(int id, PostSaveDTO updateDTO)
@@ -82,8 +98,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error updating post with ID {PostId}", id);
-                throw;
+                Logging.Error(ex, "Error updating post with ID {PostId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<PostResponse> DeletePostAsync(int id)
@@ -102,8 +118,8 @@ namespace Application.Services
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error deleting post with ID {PostId}", id);
-                throw;
+                Logging.Error(ex, "Error deleting post with ID {PostId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
+                throw new BadRequestException($"Err: {ex.Message}");
             }
         }
         public async Task<IEnumerable<PostResponse>> SearchAsync(string keyword)
