@@ -1,11 +1,11 @@
 ﻿using Application.Exceptions;
+using Application.Interfaces.Caching;
 using Application.Interfaces.Services;
 using Application.Interfaces.UnitOfWork;
 using Application.Models.Post.DTO;
 using Application.Models.Post.Response;
 using AutoMapper;
 using Domain.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Shared.Logger;
 
 namespace Application.Services
@@ -14,18 +14,40 @@ namespace Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public PostService(IUnitOfWork unitOfWork, IMapper mapper)
+        private const string CACHE_KEY = "post-all";
+        public PostService(IUnitOfWork unitOfWork, IMapper mapper, ICacheService cacheService)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
         public async Task<IEnumerable<PostDTO>> GetAllPostAsync()
         {
             try
             {
+                var cachedPosts = await _cacheService.GetAsync<IEnumerable<PostDTO>>(CACHE_KEY);
+
+                if (cachedPosts != null)
+                {
+                    Logging.Warning("CACHE HIT: {CacheKey}", CACHE_KEY);
+                    return cachedPosts;
+                }
+
+                Logging.Warning("CACHE MISS: {CacheKey}", CACHE_KEY);
+
                 var posts = await _unitOfWork.PostRepository.GetAllAsync();
-                return _mapper.Map<IEnumerable<PostDTO>>(posts);
+                var result = _mapper.Map<IEnumerable<PostDTO>>(posts);
+
+                await _cacheService.SetAsync(
+                    CACHE_KEY,
+                    result,
+                    TimeSpan.FromMinutes(5));
+
+                Logging.Warning("CACHE SET: {CacheKey}", CACHE_KEY);
+
+                return result;
             }
             catch (Exception ex)
             {

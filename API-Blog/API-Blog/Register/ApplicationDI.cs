@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Repositories;
+﻿using Application.Interfaces.Caching;
+using Application.Interfaces.Repositories;
 using Application.Interfaces.Security;
 using Application.Interfaces.Services;
 using Application.Interfaces.Services.Auth;
@@ -6,6 +7,7 @@ using Application.Interfaces.UnitOfWork;
 using Application.Models;
 using Application.Services;
 using Application.Services.Auth;
+using Infrastructure.Caching;
 using Infrastructure.Repositories;
 using Infrastructure.Security;
 using Infrastructure.UnitOfWork;
@@ -39,6 +41,15 @@ namespace API_Blog.Register
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<IPostRepository, PostRepository>();
             services.AddScoped<IPostTagMapRepository, PostTagMapRepository>();
+
+            services.AddMemoryCache();
+            services.AddScoped<ICacheService, MemoryCacheService>();
+
+            //services.AddStackExchangeRedisCache(options =>
+            //{
+            //    options.Configuration = builder.Configuration.GetSection("Redis")["Configuration"];
+            //    options.InstanceName = builder.Configuration.GetSection("Redis")["InstanceName"];
+            //});
         }
     }
 }

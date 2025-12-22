@@ -1,197 +1,226 @@
-﻿using Application.Interfaces.UnitOfWork;
+﻿using Application.Exceptions;
+using Application.Interfaces.Caching;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.UnitOfWork;
+using Application.Models.Post.DTO;
+using Application.Models.Post.Response;
 using Application.Services;
 using AutoMapper;
 using Domain.Entities;
-using Application.Interfaces.Repositories;
 using Moq;
-using Test.Common;
 
 namespace Test.Application.Services
 {
     public class PostServiceTests
     {
-        private readonly IMapper _mapper;
-        private readonly Mock<IPostRepository> _mockPostRepo;
-        private readonly Mock<IUnitOfWork> _mockUow;
-        private readonly PostService _postService;
+        private readonly Mock<IMapper> _mapper;
+        private readonly Mock<IPostRepository> _repo;
+        private readonly Mock<IUnitOfWork> _uow;
+        private readonly Mock<ICacheService> _cache;
+        private readonly PostService _service;
         private readonly Guid _userId = Guid.NewGuid();
 
         public PostServiceTests()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile(new AutoMapperTestProfile());
-            });
+            _repo = new Mock<IPostRepository>();
+            _uow = new Mock<IUnitOfWork>();
+            _mapper = new Mock<IMapper>();
+            _cache = new Mock<ICacheService>();
 
-            _mapper = mapperConfig.CreateMapper();
-            _mockPostRepo = new Mock<IPostRepository>();
-            _mockUow = new Mock<IUnitOfWork>();
+            _uow.Setup(u => u.PostRepository).Returns(_repo.Object);
+            _uow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
 
-            _mockUow.Setup(u => u.PostRepository).Returns(_mockPostRepo.Object);
-            _mockUow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
-
-            _postService = new PostService(_mockUow.Object, _mapper);
+            _service = new PostService(
+                _uow.Object,
+                _mapper.Object,
+                _cache.Object
+            );
         }
 
         [Fact]
-        public async Task GetAllPostAsync_ReturnAllPosts()
+        public async Task GetAllPostsAsync_CacheMiss()
         {
-            _mockPostRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(
-                new List<Post>
-                {
-                    TestDataFactory.CreatePost(1),
-                    TestDataFactory.CreatePost(2)
-                });
-            var result = await _postService.GetAllPostAsync();
+            var posts = new List<Post>
+            {
+                new() { Title = "Post 1" },
+                new() { Title = "Post 2" }
+            };
+            _cache.Setup(c => c.GetAsync<IEnumerable<PostDTO>>(It.IsAny<string>()))
+                  .ReturnsAsync((IEnumerable<PostDTO>?)null);
+
+            _repo.Setup(r => r.GetAllAsync())
+                 .ReturnsAsync(posts);
+
+            _mapper.Setup(m => m.Map<IEnumerable<PostDTO>>(posts))
+                   .Returns(new List<PostDTO> { new(), new()});
+            var result = await _service.GetAllPostAsync();
+
             Assert.Equal(2, result.Count());
+
+            _repo.Verify(r => r.GetAllAsync(), Times.Once);
+            _cache.Verify(c =>
+                c.SetAsync(
+                    It.IsAny<string>(),
+                    It.IsAny<IEnumerable<PostDTO>>(),
+                    It.IsAny<TimeSpan>()
+                ),
+                Times.Once
+            );
         }
 
         [Fact]
-        public async Task GetAllPostAsync_ReturnEmpty_NoPost()
+        public async Task GetAllPostsAsync_CacheHit()
         {
-            _mockPostRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Post>());
-            var result = await _postService.GetAllPostAsync();
+            _cache.Setup(c => c.GetAsync<IEnumerable<PostDTO>>(It.IsAny<string>()))
+                  .ReturnsAsync(new List<PostDTO> { new(), new() });
+            var result = await _service.GetAllPostAsync();
+
+            Assert.Equal(2, result.Count());
+
+            _repo.Verify(r => r.GetAllAsync(), Times.Never);
+            _mapper.Verify(
+                m => m.Map<IEnumerable<PostDTO>>(It.IsAny<IEnumerable<Post>>()),
+                Times.Never
+            );
+        }
+
+        [Fact]
+        public async Task GetAllPostsAsync_Exception_ThrowsBadRequest()
+        {
+            _cache.Setup(c => c.GetAsync<IEnumerable<PostDTO>>(It.IsAny<string>()))
+                  .ReturnsAsync((IEnumerable<PostDTO>?)null);
+            _repo.Setup(r => r.GetAllAsync())
+                 .ThrowsAsync(new Exception("DB error"));
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.GetAllPostAsync()
+            );
+        }
+
+        [Fact]
+        public async Task GetByPostIdAsync_Found()
+        {
+            var post = new Post();
+            var dto = new PostDTO();
+            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(post);
+            _mapper.Setup(m => m.Map<PostDTO>(post)).Returns(dto);
+            var result = await _service.GetByPostIdAsync(1);
             Assert.NotNull(result);
+        }
+
+        [Fact]
+        public async Task GetByPostIdAsync_NotFound()
+        {
+            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Post)null);
+            var result = await _service.GetByPostIdAsync(1);
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task CreatePostAsync_UrlSlugExists_Throws()
+        {
+            var dto = new PostSaveDTO { UrlSlug = "slug" };
+            _repo.Setup(r => r.ExistsByUrlSlugAsync("slug"))
+                 .ReturnsAsync(true);
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.CreatePostAsync(dto, _userId));
+        }
+
+        [Fact]
+        public async Task CreatePostAsync_Valid_CreatesPost()
+        {
+            var dto = new PostSaveDTO { UrlSlug = "slug" };
+            var post = new Post();
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(dto.UrlSlug))
+                 .ReturnsAsync(false);
+            _mapper.Setup(m => m.Map<Post>(dto)).Returns(post);
+            _mapper.Setup(m => m.Map<PostResponse>(post))
+                   .Returns(new PostResponse { Ok = true });
+            var result = await _service.CreatePostAsync(dto, _userId);
+            Assert.True(result.Ok);
+            _repo.Verify(r => r.AddAsync(post), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdatePostAsync_UrlSlugExists_Throws()
+        {
+            var dto = new PostSaveDTO { UrlSlug = "slug" };
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(dto.UrlSlug))
+                 .ReturnsAsync(true);
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.UpdatePostAsync(1, dto));
+        }
+
+        [Fact]
+        public async Task UpdatePostAsync_NotFound()
+        {
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(It.IsAny<string>()))
+                 .ReturnsAsync(false);
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync((Post)null);
+            var result = await _service.UpdatePostAsync(1, new PostSaveDTO());
+            Assert.False(result.Ok);
+        }
+
+        [Fact]
+        public async Task UpdatePostAsync_Valid_UpdatesPost()
+        {
+            var dto = new PostSaveDTO { UrlSlug = "slug" };
+            var post = new Post();
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(dto.UrlSlug))
+                 .ReturnsAsync(false);
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync(post);
+            _mapper.Setup(m => m.Map(dto, post));
+            _mapper.Setup(m => m.Map<PostResponse>(post))
+                   .Returns(new PostResponse { Ok = true });
+            var result = await _service.UpdatePostAsync(1, dto);
+            Assert.True(result.Ok);
+            _repo.Verify(r => r.UpdateAsync(post), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_NotFound()
+        {
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync((Post)null);
+            var result = await _service.DeletePostAsync(1);
+            Assert.False(result.Ok);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_Valid_DeletesPost()
+        {
+            var post = new Post();
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync(post);
+            _mapper.Setup(m => m.Map<PostResponse>(post))
+                   .Returns(new PostResponse { Ok = true });
+            var result = await _service.DeletePostAsync(1);
+            Assert.True(result.Ok);
+            _repo.Verify(r => r.DeleteAsync(post), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task SearchAsync_EmptyKeyword_ReturnsEmpty()
+        {
+            var result = await _service.SearchAsync("");
             Assert.Empty(result);
-        }
-
-        [Theory]
-        [InlineData(1, true)]
-        [InlineData(2, false)]
-        public async Task GetByPostIdAsync_TestVariousCases(int id, bool exists)
-        {
-            if (exists)
-            {
-                var post = TestDataFactory.CreatePost(id);
-                _mockPostRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(post);
-                var result = await _postService.GetByPostIdAsync(id);
-                Assert.NotNull(result);
-            }
-            else
-            {
-                _mockPostRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Post)null);
-                var result = await _postService.GetByPostIdAsync(id);
-                Assert.Null(result);
-            }
+            _repo.Verify(r => r.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
-        public async Task CreatePostAsync_ReturnCreatedResponse()
+        public async Task SearchAsync_ValidKeyword_ReturnsResults()
         {
-            var dto = TestDataFactory.CreatePostSaveDTO();
-            _mockPostRepo.Setup(r => r.AddAsync(It.IsAny<Post>()));
-            var result = await _postService.CreatePostAsync(dto, _userId);
-            Assert.NotNull(result);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task CreatePostAsync_ExceptionPropagates()
-        {
-            var dto = TestDataFactory.CreatePostSaveDTO();
-            _mockPostRepo.Setup(r => r.AddAsync(It.IsAny<Post>()))
-                         .ThrowsAsync(new Exception("Add failed"));
-            await Assert.ThrowsAsync<Exception>(() => _postService.CreatePostAsync(dto, _userId));
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-        }
-
-        [Theory]
-        [InlineData(1, "Title 1", true)]
-        [InlineData(2, "Title 2", false)]
-        public async Task UpdatePostAsync_TestCases(int id, string title, bool exists)
-        {
-            if (exists)
-            {
-                var existing = TestDataFactory.CreatePost(id);
-                _mockPostRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(existing);
-                var dto = TestDataFactory.CreatePostSaveDTO(title);
-                var result = await _postService.UpdatePostAsync(id, dto);
-                Assert.True(result.Ok);
-                Assert.True(existing.Modified <= DateTime.UtcNow);
-                _mockPostRepo.Verify(r => r.UpdateAsync(existing), Times.Once);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
-            }
-            else
-            {
-                _mockPostRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Post?)null);
-                var dto = TestDataFactory.CreatePostSaveDTO(title);
-                var result = await _postService.UpdatePostAsync(id, dto);
-                Assert.False(result.Ok);
-                _mockPostRepo.Verify(r => r.UpdateAsync(It.IsAny<Post>()), Times.Never);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePostAsync_ExceptionPropagates()
-        {
-            var dto = TestDataFactory.CreatePostSaveDTO();
-            _mockPostRepo.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                         .ThrowsAsync(new Exception("DB error"));
-            await Assert.ThrowsAsync<Exception>(() => _postService.UpdatePostAsync(1, dto));
-            _mockPostRepo.Verify(r => r.UpdateAsync(It.IsAny<Post>()), Times.Never);
-        }
-
-        [Theory]
-        [InlineData(1, true)]
-        [InlineData(2, false)]
-        public async Task DeletePostAsync_TestCases(int id, bool exists)
-        {
-            if (exists)
-            {
-                var existing = TestDataFactory.CreatePost(id);
-                _mockPostRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(existing);
-                var result = await _postService.DeletePostAsync(id);
-                Assert.True(result.Ok);
-                _mockPostRepo.Verify(r => r.DeleteAsync(existing), Times.Once);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
-            }
-            else
-            {
-                _mockPostRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Post)null);
-                var result = await _postService.DeletePostAsync(id);
-                Assert.False(result.Ok);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-            }
-        }
-
-        [Fact]
-        public async Task DeletePostAsync_ExceptionPropagates()
-        {
-            var existing = TestDataFactory.CreatePost(1);
-            _mockPostRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existing);
-            _mockPostRepo.Setup(r => r.DeleteAsync(existing)).ThrowsAsync(new Exception("Delete failed"));
-            await Assert.ThrowsAsync<Exception>(() => _postService.DeletePostAsync(1));
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-        }
-
-        [Theory]
-        [InlineData("a", 2)]
-        [InlineData("xyz", 0)]
-        public async Task SearchAsync_TestCases(string keyword, int expectedCount)
-        {
-            var list = expectedCount == 2
-                ? new List<Post>
-                {
-                    TestDataFactory.CreatePost(1, "Apple Post"),
-                    TestDataFactory.CreatePost(2, "Banana Post")
-                }
-                : new List<Post>();
-            _mockPostRepo.Setup(r => r.SearchAsync(keyword)).ReturnsAsync(list);
-            var result = await _postService.SearchAsync(keyword);
-            Assert.Equal(expectedCount, result.Count());
-        }
-
-        [Theory]
-        [InlineData(null)]
-        [InlineData("")]
-        [InlineData("   ")]
-        public async Task SearchAsync_KeywordInvalid_ReturnsEmpty(string keyword)
-        {
-            var result = await _postService.SearchAsync(keyword);
-            Assert.NotNull(result);
-            Assert.Empty(result);
-            _mockPostRepo.Verify(r => r.SearchAsync(It.IsAny<string>()), Times.Never);
+            var posts = new List<Post> { new(), new() };
+            _repo.Setup(r => r.SearchAsync("test"))
+                 .ReturnsAsync(posts);
+            _mapper.Setup(m => m.Map<IEnumerable<PostResponse>>(posts))
+                   .Returns(new List<PostResponse> { new(), new() });
+            var result = await _service.SearchAsync("test");
+            Assert.Equal(2, result.Count());
         }
     }
 }

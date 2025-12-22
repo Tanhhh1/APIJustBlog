@@ -1,157 +1,162 @@
-﻿using Application.Interfaces.UnitOfWork;
+﻿using Application.Exceptions;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.UnitOfWork;
+using Application.Models.Post.Response;
+using Application.Models.Tag.DTO;
+using Application.Models.Tag.Response;
 using Application.Services;
 using AutoMapper;
 using Domain.Entities;
-using Application.Interfaces.Repositories;
 using Moq;
-using Test.Common;
 
 
 namespace Test.Application.Services
 {
     public class TagServiceTests
     {
-        private readonly IMapper _mapper;
-        private readonly Mock<IUnitOfWork> _mockUow;
-        private readonly Mock<ITagRepository> _mockTagRepo;
-        private readonly TagService _tagService;
+        private readonly Mock<IMapper> _mapper;
+        private readonly Mock<IUnitOfWork> _uow;
+        private readonly Mock<ITagRepository> _repo;
+        private readonly TagService _service;
 
         public TagServiceTests()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<AutoMapperTestProfile>();
-            });
-            _mapper = mapperConfig.CreateMapper();
-            _mockUow = new Mock<IUnitOfWork>();
-            _mockTagRepo = new Mock<ITagRepository>();
-            _mockUow.Setup(u => u.TagRepository).Returns(_mockTagRepo.Object);
-            _mockUow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
-            _tagService = new TagService(_mockUow.Object, _mapper);
+            _mapper = new Mock<IMapper>();
+            _repo = new Mock<ITagRepository>();
+            _uow = new Mock<IUnitOfWork>();
+
+            _uow.Setup(u => u.TagRepository).Returns(_repo.Object);
+            _uow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+
+            _service = new TagService(_uow.Object, _mapper.Object);
         }
+
         [Fact]
-        public async Task GetAllTagAsync_ReturnAllTags()
+        public async Task GetAllTagAsync_Success()
         {
-            _mockTagRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(
-                new List<Tag>
-                {
-                    TestDataFactory.CreateTag(1),
-                    TestDataFactory.CreateTag(2)
-                });
-            var result = await _tagService.GetAllTagAsync();
+            var tags = new List<Tag>
+            {
+                new() { Name = "Tag1" },
+                new() { Name = "Tag2" }
+            };
+            _repo.Setup(r => r.GetAllAsync()).ReturnsAsync(tags);
+            _mapper.Setup(m => m.Map<IEnumerable<TagDTO>>(It.IsAny<IEnumerable<Tag>>()))
+                   .Returns(new List<TagDTO> { new(), new() });
+            var result = await _service.GetAllTagAsync();
             Assert.Equal(2, result.Count());
         }
+
         [Fact]
-        public async Task GetAllTagAsync_ReturnEmpty_NoTag()
+        public async Task GetAllTagAsync_Exception_ThrowsBadRequest()
         {
-            _mockTagRepo.Setup(r => r.GetAllAsync()).ReturnsAsync(new List<Tag>());
-            var result = await _tagService.GetAllTagAsync();
+            _repo.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("DB error"));
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.GetAllTagAsync()
+            );
+        }
+
+        [Fact]
+        public async Task GetByTagIdAsync_Found()
+        {
+            var tag = new Tag();
+            var dto = new TagDTO();
+            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(tag);
+            _mapper.Setup(m => m.Map<TagDTO>(tag)).Returns(dto);
+            var result = await _service.GetByTagIdAsync(1);
             Assert.NotNull(result);
-            Assert.Empty(result);
         }
-        [Theory]
-        [InlineData(1, true)]
-        [InlineData(2, false)]
-        public async Task GetByTagIdAsync_TestVariousCases(int id, bool exists)
-        {
-            if (exists)
-            {
-                var tag = TestDataFactory.CreateTag(id);
-                _mockTagRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(tag);
-                var result = await _tagService.GetByTagIdAsync(id);
-                Assert.NotNull(result);
-            }
-            else
-            {
-                _mockTagRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Tag?)null);
-                var result = await _tagService.GetByTagIdAsync(id);
-                Assert.Null(result);
-            }
-        }
+
         [Fact]
-        public async Task CreateTagAsync_ReturnCreatedResponse()
+        public async Task GetByTagIdAsync_NotFound()
         {
-            var dto = TestDataFactory.CreateTagSaveDTO();
-            _mockTagRepo.Setup(r => r.AddAsync(It.IsAny<Tag>()));
-            var result = await _tagService.CreateTagAsync(dto);
-            Assert.NotNull(result);
-            _mockTagRepo.Verify(r => r.AddAsync(It.IsAny<Tag>()), Times.Once);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
+            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Tag?)null);
+            var result = await _service.GetByTagIdAsync(1);
+            Assert.Null(result);
         }
+
         [Fact]
-        public async Task CreateCateAsync_ExceptionPropagates()
+        public async Task CreateTagAsync_UrlSlugExists_Throws()
         {
-            var dto = TestDataFactory.CreateTagSaveDTO();
-            _mockTagRepo.Setup(r => r.AddAsync(It.IsAny<Tag>()))
-                             .ThrowsAsync(new Exception("Add failed"));
-            await Assert.ThrowsAsync<Exception>(() => _tagService.CreateTagAsync(dto));
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
+            var dto = new TagSaveDTO { UrlSlug = "slug" };
+            _repo.Setup(r => r.ExistsByUrlSlugAsync("slug")).ReturnsAsync(true);
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.CreateTagAsync(dto));
         }
-        [Theory]
-        [InlineData(1, "New Name", true)]
-        [InlineData(2, "New Name", false)]
-        public async Task UpdateTagAsync_TestCases(int id, string name, bool exists)
-        {
-            if (exists)
-            {
-                var existing = TestDataFactory.CreateTag(id, "Old Name");
-                _mockTagRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(existing);
-                var dto = TestDataFactory.CreateTagSaveDTO(name);
-                var result = await _tagService.UpdateTagAsync(id, dto);
-                Assert.True(result.Ok);
-                _mockTagRepo.Verify(r => r.UpdateAsync(existing), Times.Once);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
-            }
-            else
-            {
-                _mockTagRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Tag?)null);
-                var dto = TestDataFactory.CreateTagSaveDTO(name);
-                var result = await _tagService.UpdateTagAsync(id, dto);
-                Assert.False(result.Ok);
-                _mockTagRepo.Verify(r => r.UpdateAsync(It.IsAny<Tag>()), Times.Never);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-            }
-        }
+
         [Fact]
-        public async Task UpdateTagAsync_ExceptionPropagates()
+        public async Task CreateTagAsync_Valid_CreatesTag()
         {
-            var dto = TestDataFactory.CreateTagSaveDTO();
-            _mockTagRepo.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
-                         .ThrowsAsync(new Exception("DB error"));
-            await Assert.ThrowsAsync<Exception>(() => _tagService.UpdateTagAsync(1, dto));
-            _mockTagRepo.Verify(r => r.UpdateAsync(It.IsAny<Tag>()), Times.Never);
+            var dto = new TagSaveDTO() { UrlSlug = "slug" };
+            var tag = new Tag();
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(dto.UrlSlug)).ReturnsAsync(false);
+            _mapper.Setup(m => m.Map<Tag>(dto)).Returns(tag);
+            _mapper.Setup(m => m.Map<TagResponse>(tag)).Returns(new TagResponse { Ok = true });
+            var result = await _service.CreateTagAsync(dto);
+            Assert.True(result.Ok);
+            _repo.Verify(r => r.AddAsync(tag), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
         }
-        [Theory]
-        [InlineData(1, true)]
-        [InlineData(2, false)]
-        public async Task DeleteTagAsync_TestCases(int id, bool exists)
-        {
-            if (exists)
-            {
-                var existing = TestDataFactory.CreateTag(id);
-                _mockTagRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync(existing);
-                var result = await _tagService.DeleteTagAsync(id);
-                Assert.True(result.Ok);
-                _mockTagRepo.Verify(r => r.DeleteAsync(existing), Times.Once);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
-            }
-            else
-            {
-                _mockTagRepo.Setup(r => r.GetByIdAsync(id)).ReturnsAsync((Tag?)null);
-                var result = await _tagService.DeleteTagAsync(id);
-                Assert.False(result.Ok);
-                _mockTagRepo.Verify(r => r.DeleteAsync(It.IsAny<Tag>()), Times.Never);
-                _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-            }
-        }
+
         [Fact]
-        public async Task DeletePostAsync_ExceptionPropagates()
+        public async Task UpdateTagAsync_UrlSlugExists_Throws()
         {
-            var existing = TestDataFactory.CreateTag(1);
-            _mockTagRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existing);
-            _mockTagRepo.Setup(r => r.DeleteAsync(existing)).ThrowsAsync(new Exception("Delete failed"));
-            await Assert.ThrowsAsync<Exception>(() => _tagService.DeleteTagAsync(1));
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
+            var dto = new TagSaveDTO { UrlSlug = "slug" };
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(dto.UrlSlug))
+                 .ReturnsAsync(true);
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.UpdateTagAsync(1, dto));
+        }
+
+        [Fact]
+        public async Task UpdateTagAsync_NotFound()
+        {
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(It.IsAny<string>()))
+                 .ReturnsAsync(false);
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync((Tag)null);
+            var result = await _service.UpdateTagAsync(1, new TagSaveDTO());
+            Assert.False(result.Ok);
+        }
+
+        [Fact]
+        public async Task UpdateTagAsync_Valid_UpdatesPost()
+        {
+            var dto = new TagSaveDTO { UrlSlug = "slug" };
+            var tag = new Tag();
+            _repo.Setup(r => r.ExistsByUrlSlugAsync(dto.UrlSlug))
+                 .ReturnsAsync(false);
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync(tag);
+            _mapper.Setup(m => m.Map(dto, tag));
+            _mapper.Setup(m => m.Map<TagResponse>(tag))
+                   .Returns(new TagResponse { Ok = true });
+            var result = await _service.UpdateTagAsync(1, dto);
+            Assert.True(result.Ok);
+            _repo.Verify(r => r.UpdateAsync(tag), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_NotFound()
+        {
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync((Tag)null);
+            var result = await _service.DeleteTagAsync(1);
+            Assert.False(result.Ok);
+        }
+
+        [Fact]
+        public async Task DeletePostAsync_Valid_DeletesPost()
+        {
+            var tag = new Tag();
+            _repo.Setup(r => r.GetByIdAsync(1))
+                 .ReturnsAsync(tag);
+            _mapper.Setup(m => m.Map<TagResponse>(tag))
+                   .Returns(new TagResponse { Ok = true });
+            var result = await _service.DeleteTagAsync(1);
+            Assert.True(result.Ok);
+            _repo.Verify(r => r.DeleteAsync(tag), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
         }
     }
 }

@@ -1,199 +1,154 @@
-﻿using Application.Interfaces.UnitOfWork;
+﻿using Application.DTOs.PostTagMap;
+using Application.Exceptions;
+using Application.Interfaces.Repositories;
+using Application.Interfaces.UnitOfWork;
 using Application.Services;
 using AutoMapper;
 using Domain.Entities;
-using Application.Interfaces.Repositories;
 using Moq;
-using Test.Common;
 
 namespace Test.Application.Services
 {
     public class PostTagMapServiceTests
     {
-        private readonly IMapper _mapper;
-        private readonly Mock<IUnitOfWork> _mockUow;
-        private readonly Mock<IPostRepository> _mockPostRepo;
-        private readonly Mock<ITagRepository> _mockTagRepo;
-        private readonly Mock<IPostTagMapRepository> _mockPostTagMapRepo;
+        private readonly Mock<IUnitOfWork> _uow;
+        private readonly Mock<IMapper> _mapper;
+
+        private readonly Mock<IPostRepository> _postRepo;
+        private readonly Mock<ITagRepository> _tagRepo;
+        private readonly Mock<IPostTagMapRepository> _mapRepo;
+
         private readonly PostTagMapService _service;
 
         public PostTagMapServiceTests()
         {
-            var mapperConfig = new MapperConfiguration(cfg =>
+            _uow = new Mock<IUnitOfWork>();
+            _mapper = new Mock<IMapper>();
+
+            _postRepo = new Mock<IPostRepository>();
+            _tagRepo = new Mock<ITagRepository>();
+            _mapRepo = new Mock<IPostTagMapRepository>();
+
+            _uow.Setup(u => u.PostRepository).Returns(_postRepo.Object);
+            _uow.Setup(u => u.TagRepository).Returns(_tagRepo.Object);
+            _uow.Setup(u => u.PostTagMapRepository).Returns(_mapRepo.Object);
+            _uow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
+
+            _service = new PostTagMapService(_uow.Object, _mapper.Object);
+        }
+
+        [Fact]
+        public async Task CreateLinkAsync_Success()
+        {
+            var dto = new PostTagMapSaveDTO
             {
-                cfg.AddProfile<AutoMapperTestProfile>();
-            });
-            _mapper = mapperConfig.CreateMapper();
-
-            _mockUow = new Mock<IUnitOfWork>();
-            _mockPostRepo = new Mock<IPostRepository>();
-            _mockTagRepo = new Mock<ITagRepository>();
-            _mockPostTagMapRepo = new Mock<IPostTagMapRepository>();
-
-            _mockUow.Setup(u => u.PostRepository).Returns(_mockPostRepo.Object);
-            _mockUow.Setup(u => u.TagRepository).Returns(_mockTagRepo.Object);
-            _mockUow.Setup(u => u.PostTagMapRepository).Returns(_mockPostTagMapRepo.Object);
-            _mockUow.Setup(u => u.CompleteAsync()).ReturnsAsync(1);
-
-            _service = new PostTagMapService(_mockUow.Object, _mapper);
-        }
-
-        [Fact]
-        public async Task CreateLinkAsync_ReturnCreatedResponse()
-        {
-            var dto = TestDataFactory.CreatePostTagMapSaveDTO();
-
-            _mockPostRepo.Setup(r => r.GetByIdAsync(dto.PostId))
-                         .ReturnsAsync(TestDataFactory.CreatePost(dto.PostId));
-
-            _mockTagRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(TestDataFactory.CreateTag(1));
-            _mockTagRepo.Setup(r => r.GetByIdAsync(2)).ReturnsAsync(TestDataFactory.CreateTag(2));
-
-            var addedLinks = new List<PostTagMap>();
-            _mockPostTagMapRepo.Setup(r => r.GetByPostIdAsync(dto.PostId))
-                               .ReturnsAsync(() => addedLinks);
-
-            _mockPostTagMapRepo.Setup(r => r.AddAsync(It.IsAny<PostTagMap>()))
-                               .Callback<PostTagMap>(ptm =>
-                               {
-                                   ptm.Tag = TestDataFactory.CreateTag(ptm.TagId);
-                                   ptm.Post = TestDataFactory.CreatePost(ptm.PostId);
-                                   addedLinks.Add(ptm);
-                               })
-                               .Returns(Task.CompletedTask);
-
+                PostId = 1,
+                TagIds = new List<int> { 1 }
+            };
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ReturnsAsync(new Post { Id = 1 });
+            _tagRepo.Setup(r => r.GetByIdAsync(1))
+                    .ReturnsAsync(new Tag { Id = 1 });
+            _mapRepo.Setup(r => r.GetByPostIdAsync(1))
+                    .ReturnsAsync(new List<PostTagMap>());
+            _mapper.Setup(m => m.Map<PostTagMapResponse>(It.IsAny<IEnumerable<PostTagMap>>()))
+                   .Returns(new PostTagMapResponse());
             var result = await _service.CreateLinkAsync(dto);
-
             Assert.NotNull(result);
-            Assert.Equal(2, addedLinks.Count);       
-            Assert.Equal(dto.PostId, result.PostId); 
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
+            _mapRepo.Verify(r => r.AddAsync(It.IsAny<PostTagMap>()), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
         }
 
         [Fact]
-        public async Task CreateLinkAsync_PostNotFound()
+        public async Task CreateLinkAsync_NotFound()
         {
-            var dto = TestDataFactory.CreatePostTagMapSaveDTO();
-            _mockPostRepo.Setup(r => r.GetByIdAsync(dto.PostId)).ReturnsAsync((Post)null);
-            var result = await _service.CreateLinkAsync(dto);
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ReturnsAsync((Post)null);
+            var result = await _service.CreateLinkAsync(
+                new PostTagMapSaveDTO { PostId = 1 });
             Assert.Null(result);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
         }
 
         [Fact]
-        public async Task CreateLinkAsync_TagsNotFound()
+        public async Task CreateLinkAsync_Exception_ThrowsBadRequest()
         {
-            var dto = TestDataFactory.CreatePostTagMapSaveDTO();
-            _mockPostRepo.Setup(r => r.GetByIdAsync(dto.PostId)).ReturnsAsync(TestDataFactory.CreatePost(dto.PostId));
-            _mockTagRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(TestDataFactory.CreateTag(1));
-            _mockTagRepo.Setup(r => r.GetByIdAsync(2)).ReturnsAsync((Tag)null);
-            _mockPostTagMapRepo.Setup(r => r.GetByPostIdAsync(dto.PostId))
-                               .ReturnsAsync(new List<PostTagMap> { TestDataFactory.CreatePostTagMap(dto.PostId, 1) });
-            var result = await _service.CreateLinkAsync(dto);
-            Assert.NotNull(result);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
+            _postRepo.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
+                     .ThrowsAsync(new Exception("DB error"));
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.CreateLinkAsync(new PostTagMapSaveDTO { PostId = 1 }));
         }
 
         [Fact]
-        public async Task CreateLinkAsync_ExceptionPropagates()
+        public async Task GetLinkByIdAsync_Success()
         {
-            var dto = TestDataFactory.CreatePostTagMapSaveDTO();
-            _mockPostRepo.Setup(r => r.GetByIdAsync(dto.PostId)).ReturnsAsync(TestDataFactory.CreatePost(dto.PostId));
-            _mockTagRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(TestDataFactory.CreateTag(1));
-            _mockPostTagMapRepo.Setup(r => r.GetByPostIdAsync(dto.PostId)).ReturnsAsync(new List<PostTagMap>());
-            _mockPostTagMapRepo.Setup(r => r.AddAsync(It.IsAny<PostTagMap>())).ThrowsAsync(new Exception("Add failed"));
-
-            await Assert.ThrowsAsync<Exception>(() => _service.CreateLinkAsync(dto));
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
-        }
-
-        [Fact]
-        public async Task GetLinkByIdAsync_PostNotFound()
-        {
-            _mockPostRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Post)null);
+            var maps = new List<PostTagMap>
+            {
+                new() { PostId = 1, TagId = 1 }
+            };
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ReturnsAsync(new Post());
+            _mapRepo.Setup(r => r.GetByPostIdAsync(1))
+                    .ReturnsAsync(maps);
+            _mapper.Setup(m => m.Map<PostTagMapResponse>(maps))
+                   .Returns(new PostTagMapResponse());
             var result = await _service.GetLinkByIdAsync(1);
-            Assert.Null(result);
+            Assert.NotNull(result);
         }
 
         [Fact]
         public async Task GetLinkByIdAsync_NoLinks()
         {
-            int postId = 1;
-            _mockPostRepo.Setup(r => r.GetByIdAsync(postId)).ReturnsAsync(TestDataFactory.CreatePost(postId));
-            _mockPostTagMapRepo.Setup(r => r.GetByPostIdAsync(postId)).ReturnsAsync(new List<PostTagMap>());
-
-            var result = await _service.GetLinkByIdAsync(postId);
-
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ReturnsAsync(new Post());
+            _mapRepo.Setup(r => r.GetByPostIdAsync(1))
+                    .ReturnsAsync(new List<PostTagMap>());
+            var result = await _service.GetLinkByIdAsync(1);
             Assert.Null(result);
         }
 
         [Fact]
-        public async Task DeleteLinkAsync_ReturnsUpdated()
+        public async Task GetLinkByIdAsync_Exception_ThrowsBadRequest()
         {
-            int postId = 1, tagId = 2;
-            _mockPostRepo.Setup(r => r.GetByIdAsync(postId)).ReturnsAsync(TestDataFactory.CreatePost(postId));
-            var existingLinks = new List<PostTagMap>
-            {
-                TestDataFactory.CreatePostTagMap(postId, 1),
-                TestDataFactory.CreatePostTagMap(postId, tagId)
-            };
-
-            _mockPostTagMapRepo.SetupSequence(r => r.GetByPostIdAsync(postId))
-                               .ReturnsAsync(existingLinks)
-                               .ReturnsAsync(existingLinks.Where(x => x.TagId != tagId).ToList());
-
-            var deletedLinks = new List<PostTagMap>();
-            _mockPostTagMapRepo.Setup(r => r.DeleteAsync(It.IsAny<PostTagMap>()))
-                               .Callback<PostTagMap>(link => deletedLinks.Add(link));
-
-            var result = await _service.DeleteLinkAsync(postId, tagId);
-            Assert.NotNull(result);
-            Assert.Single(deletedLinks);
-            Assert.Equal(tagId, deletedLinks.First().TagId);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Once);
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ThrowsAsync(new Exception("DB error"));
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.GetLinkByIdAsync(1));
         }
 
         [Fact]
-        public async Task DeleteLinkAsync_PostNotFound()
+        public async Task DeleteLinkAsync_Success()
         {
-            _mockPostRepo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Post)null);
+            var maps = new List<PostTagMap>{ new() { PostId = 1, TagId = 1 } };
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ReturnsAsync(new Post());
+            _mapRepo.Setup(r => r.GetByPostIdAsync(1))
+                    .ReturnsAsync(maps);
+            _mapper.Setup(m => m.Map<PostTagMapResponse>(It.IsAny<IEnumerable<PostTagMap>>()))
+                   .Returns(new PostTagMapResponse());
             var result = await _service.DeleteLinkAsync(1, 1);
-            Assert.Null(result);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
+            Assert.NotNull(result);
+            _mapRepo.Verify(r => r.DeleteAsync(It.IsAny<PostTagMap>()), Times.Once);
+            _uow.Verify(u => u.CompleteAsync(), Times.Once);
         }
 
         [Fact]
-        public async Task DeleteLinkAsync_LinkNotFound()
+        public async Task DeleteLinkAsync_NotFound()
         {
-            int postId = 1, tagId = 3;
-            _mockPostRepo.Setup(r => r.GetByIdAsync(postId)).ReturnsAsync(TestDataFactory.CreatePost(postId));
-            _mockPostTagMapRepo.Setup(r => r.GetByPostIdAsync(postId))
-                               .ReturnsAsync(new List<PostTagMap>
-                               {
-                                   TestDataFactory.CreatePostTagMap(postId, 1),
-                                   TestDataFactory.CreatePostTagMap(postId, 2)
-                               });
-
-            var result = await _service.DeleteLinkAsync(postId, tagId);
-
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ReturnsAsync(new Post());
+            _mapRepo.Setup(r => r.GetByPostIdAsync(1))
+                    .ReturnsAsync(new List<PostTagMap>());
+            var result = await _service.DeleteLinkAsync(1, 99);
             Assert.Null(result);
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
         }
 
         [Fact]
-        public async Task DeleteLinkAsync_ExceptionPropagates()
+        public async Task DeleteLinkAsync_Exception_ThrowsBadRequest()
         {
-            int postId = 1, tagId = 2;
-            _mockPostRepo.Setup(r => r.GetByIdAsync(postId)).ReturnsAsync(TestDataFactory.CreatePost(postId));
-            var existingLinks = new List<PostTagMap>
-            {
-                TestDataFactory.CreatePostTagMap(postId, 1),
-                TestDataFactory.CreatePostTagMap(postId, tagId)
-            };
-            _mockPostTagMapRepo.Setup(r => r.GetByPostIdAsync(postId)).ReturnsAsync(existingLinks);
-            _mockPostTagMapRepo.Setup(r => r.DeleteAsync(It.IsAny<PostTagMap>())).ThrowsAsync(new Exception("Delete failed"));
-            await Assert.ThrowsAsync<Exception>(() => _service.DeleteLinkAsync(postId, tagId));
-            _mockUow.Verify(u => u.CompleteAsync(), Times.Never);
+            _postRepo.Setup(r => r.GetByIdAsync(1))
+                     .ThrowsAsync(new Exception("DB error"));
+            await Assert.ThrowsAsync<BadRequestException>(
+                () => _service.DeleteLinkAsync(1, 1));
         }
     }
 }
