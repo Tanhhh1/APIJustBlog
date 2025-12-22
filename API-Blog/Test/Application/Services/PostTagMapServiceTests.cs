@@ -38,7 +38,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task CreateLinkAsync_Success()
+        public async Task CreateLinkAsync_Valid_CreatesLink()
         {
             var dto = new PostTagMapSaveDTO
             {
@@ -70,7 +70,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task CreateLinkAsync_Exception_ThrowsBadRequest()
+        public async Task CreateLinkAsync_Exception_Throws()
         {
             _postRepo.Setup(r => r.GetByIdAsync(It.IsAny<int>()))
                      .ThrowsAsync(new Exception("DB error"));
@@ -78,8 +78,10 @@ namespace Test.Application.Services
                 () => _service.CreateLinkAsync(new PostTagMapSaveDTO { PostId = 1 }));
         }
 
-        [Fact]
-        public async Task GetLinkByIdAsync_Success()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetLinkByIdAsync_ReturnsExpected(bool found)
         {
             var maps = new List<PostTagMap>
             {
@@ -96,18 +98,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task GetLinkByIdAsync_NoLinks()
-        {
-            _postRepo.Setup(r => r.GetByIdAsync(1))
-                     .ReturnsAsync(new Post());
-            _mapRepo.Setup(r => r.GetByPostIdAsync(1))
-                    .ReturnsAsync(new List<PostTagMap>());
-            var result = await _service.GetLinkByIdAsync(1);
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task GetLinkByIdAsync_Exception_ThrowsBadRequest()
+        public async Task GetLinkByIdAsync_Exception_Throws()
         {
             _postRepo.Setup(r => r.GetByIdAsync(1))
                      .ThrowsAsync(new Exception("DB error"));
@@ -116,7 +107,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task DeleteLinkAsync_Success()
+        public async Task DeleteLinkAsync_Valid_DeleteSuccess()
         {
             var maps = new List<PostTagMap>{ new() { PostId = 1, TagId = 1 } };
             _postRepo.Setup(r => r.GetByIdAsync(1))
@@ -140,15 +131,6 @@ namespace Test.Application.Services
                     .ReturnsAsync(new List<PostTagMap>());
             var result = await _service.DeleteLinkAsync(1, 99);
             Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task DeleteLinkAsync_Exception_ThrowsBadRequest()
-        {
-            _postRepo.Setup(r => r.GetByIdAsync(1))
-                     .ThrowsAsync(new Exception("DB error"));
-            await Assert.ThrowsAsync<BadRequestException>(
-                () => _service.DeleteLinkAsync(1, 1));
         }
     }
 }

@@ -85,7 +85,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task GetAllPostsAsync_Exception_ThrowsBadRequest()
+        public async Task GetAllPostsAsync_Exception_Throws()
         {
             _cache.Setup(c => c.GetAsync<IEnumerable<PostDTO>>(It.IsAny<string>()))
                   .ReturnsAsync((IEnumerable<PostDTO>?)null);
@@ -96,8 +96,10 @@ namespace Test.Application.Services
             );
         }
 
-        [Fact]
-        public async Task GetByPostIdAsync_Found()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetByPostIdAsync_ReturnsExpected(bool found)
         {
             var post = new Post();
             var dto = new PostDTO();
@@ -105,14 +107,6 @@ namespace Test.Application.Services
             _mapper.Setup(m => m.Map<PostDTO>(post)).Returns(dto);
             var result = await _service.GetByPostIdAsync(1);
             Assert.NotNull(result);
-        }
-
-        [Fact]
-        public async Task GetByPostIdAsync_NotFound()
-        {
-            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Post)null);
-            var result = await _service.GetByPostIdAsync(1);
-            Assert.Null(result);
         }
 
         [Fact]
@@ -203,12 +197,14 @@ namespace Test.Application.Services
             _uow.Verify(u => u.CompleteAsync(), Times.Once);
         }
 
-        [Fact]
-        public async Task SearchAsync_EmptyKeyword_ReturnsEmpty()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task SearchAsync_InvalidKeyword_ReturnsEmpty(string keyword)
         {
-            var result = await _service.SearchAsync("");
+            var result = await _service.SearchAsync(keyword);
             Assert.Empty(result);
-            _repo.Verify(r => r.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]

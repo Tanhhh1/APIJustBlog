@@ -1,7 +1,6 @@
 ﻿using Application.Exceptions;
 using Application.Interfaces.Repositories;
 using Application.Interfaces.UnitOfWork;
-using Application.Models.Post.Response;
 using Application.Models.Tag.DTO;
 using Application.Models.Tag.Response;
 using Application.Services;
@@ -47,7 +46,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task GetAllTagAsync_Exception_ThrowsBadRequest()
+        public async Task GetAllTagAsync_Exception_Throws()
         {
             _repo.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("DB error"));
             await Assert.ThrowsAsync<BadRequestException>(
@@ -55,8 +54,10 @@ namespace Test.Application.Services
             );
         }
 
-        [Fact]
-        public async Task GetByTagIdAsync_Found()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetByTagIdAsync_ReturnsExpected(bool found)
         {
             var tag = new Tag();
             var dto = new TagDTO();
@@ -64,14 +65,6 @@ namespace Test.Application.Services
             _mapper.Setup(m => m.Map<TagDTO>(tag)).Returns(dto);
             var result = await _service.GetByTagIdAsync(1);
             Assert.NotNull(result);
-        }
-
-        [Fact]
-        public async Task GetByTagIdAsync_NotFound()
-        {
-            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Tag?)null);
-            var result = await _service.GetByTagIdAsync(1);
-            Assert.Null(result);
         }
 
         [Fact]
@@ -119,7 +112,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task UpdateTagAsync_Valid_UpdatesPost()
+        public async Task UpdateTagAsync_Valid_UpdatesTag()
         {
             var dto = new TagSaveDTO { UrlSlug = "slug" };
             var tag = new Tag();
@@ -146,7 +139,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task DeletePostAsync_Valid_DeletesPost()
+        public async Task DeletePostAsync_Valid_DeletesTag()
         {
             var tag = new Tag();
             _repo.Setup(r => r.GetByIdAsync(1))

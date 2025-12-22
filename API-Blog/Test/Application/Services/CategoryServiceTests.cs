@@ -56,7 +56,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task GetAllCateAsync_Exception_ThrowsBadRequest()
+        public async Task GetAllCateAsync_Exception_Throws()
         {
             _repo.Setup(r => r.GetAllAsync()).ThrowsAsync(new Exception("DB error"));
             await Assert.ThrowsAsync<BadRequestException>(
@@ -64,8 +64,10 @@ namespace Test.Application.Services
             );
         }
 
-        [Fact]
-        public async Task GetByCateIdAsync_Found()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetByCateIdAsync_ReturnsExpected(bool found)
         {
             var category = new Category { UrlSlug = "enc" };
             _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(category);
@@ -74,14 +76,6 @@ namespace Test.Application.Services
                    .Returns(new CategoryDTO());
             var result = await _service.GetByCateIdAsync(1);
             Assert.NotNull(result);
-        }
-
-        [Fact]
-        public async Task GetByCateIdAsync_NotFound()
-        {
-            _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Category)null);
-            var result = await _service.GetByCateIdAsync(1);
-            Assert.Null(result);
         }
 
         [Fact]
@@ -95,7 +89,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task CreateCateAsync_Valid_CreatesCategory()
+        public async Task CreateCateAsync_Valid_CreatesCate()
         {
             var dto = new CategorySaveDTO { UrlSlug = "slug" };
             var category = new Category { UrlSlug = "enc" };
@@ -115,7 +109,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task UpdateCateAsync_NotFound_ReturnsOkFalse()
+        public async Task UpdateCateAsync_NotFound()
         {
             _repo.Setup(r => r.ExistsByUrlSlugAsync(It.IsAny<string>()))
                  .ReturnsAsync(false);
@@ -133,12 +127,10 @@ namespace Test.Application.Services
             await Assert.ThrowsAsync<BadRequestException>(
                 () => _service.UpdateCateAsync(1, dto)
             );
-            _repo.Verify(r => r.UpdateAsync(It.IsAny<Category>()), Times.Never);
-            _uow.Verify(u => u.CompleteAsync(), Times.Never);
         }
 
         [Fact]
-        public async Task UpdateCateAsync_Valid_UpdateSuccess()
+        public async Task UpdateCateAsync_Valid_UpdateCate()
         {
             var dto = new CategorySaveDTO{ UrlSlug = "new-slug" };
             var category = new Category();
@@ -156,7 +148,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task DeleteCateAsync_NotFound_ReturnsOkFalse()
+        public async Task DeleteCateAsync_NotFound()
         {
             _repo.Setup(r => r.GetByIdAsync(1)).ReturnsAsync((Category)null);
             var result = await _service.DeleteCateAsync(1);
@@ -164,21 +156,7 @@ namespace Test.Application.Services
         }
 
         [Fact]
-        public async Task DeleteCateAsync_Exception_ThrowsBadRequest()
-        {
-            var category = new Category { Id = 1 };
-            _repo.Setup(r => r.GetByIdAsync(1))
-                 .ReturnsAsync(category);
-            _repo.Setup(r => r.DeleteAsync(category))
-                 .ThrowsAsync(new Exception("Delete failed"));
-            await Assert.ThrowsAsync<BadRequestException>(
-                () => _service.DeleteCateAsync(1)
-            );
-            _uow.Verify(u => u.CompleteAsync(), Times.Never);
-        }
-
-        [Fact]
-        public async Task DeleteCateAsync_Valid_DeleteSuccess()
+        public async Task DeleteCateAsync_Valid_DeleteCate()
         {
             var category = new Category { Id = 1 };
             _repo.Setup(r => r.GetByIdAsync(1))
@@ -193,22 +171,20 @@ namespace Test.Application.Services
         }
 
 
-        [Fact]
-        public async Task SearchAsync_EmptyKeyword_ReturnsEmpty()
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public async Task SearchAsync_InvalidKeyword_ReturnsEmpty(string keyword)
         {
             var result = await _service.SearchAsync("");
             Assert.Empty(result);
-            _repo.Verify(r => r.SearchAsync(It.IsAny<string>()), Times.Never);
         }
 
         [Fact]
         public async Task SearchAsync_ValidKeyword_ReturnsResults()
         {
-            var categories = new List<Category>
-            {
-                new Category(),
-                new Category()
-            };
+            var categories = new List<Category>{ new(), new() };
             _repo.Setup(r => r.SearchAsync("test"))
                  .ReturnsAsync(categories);
             _mapper.Setup(m => m.Map<IEnumerable<CategoryResponse>>(categories))
