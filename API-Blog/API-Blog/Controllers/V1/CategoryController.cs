@@ -1,6 +1,7 @@
 ﻿using API_Blog.Controllers.Common;
 using Application.Common.ModelServices;
 using Application.Interfaces.Services;
+using Application.Models.Category;
 using Application.Models.Category.DTO;
 using Application.Models.Category.Response;
 using Microsoft.AspNetCore.Mvc;
@@ -19,17 +20,10 @@ namespace API_Blog.Controllers.V1
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAllCate([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] string keyword = null)
+        public async Task<IActionResult> GetAll([FromQuery] CategoryQuery query)
         {
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                var result = await _categoryService.SearchAsync(keyword);
-                if (!result.Any())
-                    return NotFound(ApiResult<CategoryResponse>.Failure(new List<string> { "No matching categories found" }));
-                return Ok(result);
-            }
-            var paged = await _categoryService.GetAllCateAsync(pageNumber, pageSize);
-            return Ok(ApiResult<PageList<CategoryDTO>>.Success(paged));
+            var result = await _categoryService.GetAllCateAsync(query);
+            return Ok(ApiResult<PageList<CategoryDTO>>.Success(result));
         }
 
         [HttpGet("{id}")]

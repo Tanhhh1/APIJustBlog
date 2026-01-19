@@ -4,49 +4,32 @@ namespace Application.Common.ModelServices;
 
 public class PageList<T>
 {
-    public int CurrentPage { get; set; }
+    public int PageIndex { get; set; }
     public int TotalPages { get; set; }
     public int PageSize { get; private set; }
     public int TotalCount { get; private set; }
 
-    public bool HasPrevious => CurrentPage > 1;
-    public bool HasNext => CurrentPage < TotalPages;
+    public bool HasPrevious => PageIndex > 1;
+    public bool HasNext => PageIndex < TotalPages;
     public IEnumerable<T> Items { get; private set; }
 
-    public PageList(IEnumerable<T> items, int count, int pageNumber, int pageSize)
+    public PageList(IEnumerable<T> items, int count, int pageIndex, int pageSize)
     {
         TotalCount = count;
         PageSize = pageSize;
-        CurrentPage = pageNumber;
+        PageIndex = pageIndex;
         TotalPages = (int)Math.Ceiling(count / (double)pageSize);
         Items = items;
     }
 
-    public static PageList<T> ToPagedList(IQueryable<T> source, int pageNumber, int pageSize)
+    public static async Task<PageList<T>> ToPagedListAsync(IQueryable<T> source, int pageIndex, int pageSize)
     {
-        var count = source.Count();
+        if (pageIndex < 1) pageIndex = 1;
+        if (pageSize < 1) pageSize = 10;
 
-        if (pageSize <= 0)
-        {
-            return new PageList<T>(source.ToList(), count, 1, count);
-        }
-        if (pageNumber < 1) pageNumber = 1;
+        var count = await source.CountAsync();
+        var items = await source.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
 
-        var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        return new PageList<T>(items, count, pageNumber, pageSize);
-    }
-
-    public static async Task<PageList<T>> ToPagedListAsync(IQueryable<T> source, int pageNumber, int pageSize)
-    {
-        var count = source.Count();
-
-        if (pageSize <= 0)
-        {
-            return new PageList<T>(await source.ToListAsync(), count, 1, count);
-        }
-        if (pageNumber < 1) pageNumber = 1;
-
-        var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
-        return new PageList<T>(items, count, pageNumber, pageSize);
+        return new PageList<T>(items, count, pageIndex, pageSize);
     }
 }

@@ -3,6 +3,7 @@ using Application.Exceptions;
 using Application.Interfaces.Security;
 using Application.Interfaces.Services;
 using Application.Interfaces.UnitOfWork;
+using Application.Models.Category;
 using Application.Models.Category.DTO;
 using Application.Models.Category.Response;
 using AutoMapper;
@@ -23,29 +24,41 @@ namespace Application.Services
             _mapper = mapper;
             _crypto = crypto;
         }
-        public async Task<PageList<CategoryDTO>> GetAllCateAsync(int pageNumber, int pageSize)
+        public async Task<PageList<CategoryDTO>> GetAllCateAsync(CategoryQuery query)
         {
             try
             {
-                var categories = await _unitOfWork.CategoryRepository.GetAllAsync();
-                var count = categories.Count();
-                if (pageSize <= 0)
+                IQueryable<Category> categories =
+                    _unitOfWork.CategoryRepository.GetByCondition();
+
+                if (!string.IsNullOrWhiteSpace(query.Keyword))
                 {
-                    pageSize = count == 0 ? 1 : count;
+                    categories = categories.Where(c =>
+                        c.Name.Contains(query.Keyword) ||
+                        c.Description.Contains(query.Keyword));
                 }
-                if (pageNumber < 1) pageNumber = 1;
-                var pagedItems = categories.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-                foreach (var category in pagedItems)
+
+                var pagedCategories = await PageList<Category>
+                    .ToPagedListAsync(categories, query.PageIndex, query.PageSize);
+
+                foreach (var category in pagedCategories.Items)
                 {
                     category.UrlSlug = _crypto.Decrypt(category.UrlSlug);
                 }
-                var dtoItems = _mapper.Map<IEnumerable<CategoryDTO>>(pagedItems);
-                return new PageList<CategoryDTO>(dtoItems, count, pageNumber, pageSize);
+
+                var dtoItems = _mapper.Map<IEnumerable<CategoryDTO>>(pagedCategories.Items);
+
+                return new PageList<CategoryDTO>(
+                    dtoItems,
+                    pagedCategories.TotalCount,
+                    pagedCategories.PageIndex,
+                    pagedCategories.PageSize
+                );
             }
             catch (Exception ex)
             {
-                Logging.Error(ex, "Error retrieving categories. Message: {Message}\nStackTrace: {StackTrace}", ex.Message, ex.StackTrace);
-                throw new BadRequestException($"Err: {ex.Message}");
+                Logging.Error(ex, "Error retrieving categories");
+                throw new BadRequestException(ex.Message);
             }
         }
 
@@ -138,14 +151,6 @@ namespace Application.Services
                 Logging.Error(ex, "Error deleting category with ID {CategoryId}. Message: {Message}\nStackTrace: {StackTrace}", id, ex.Message, ex.StackTrace);
                 throw new BadRequestException($"Err: {ex.Message}");
             }
-        }
-        public async Task<IEnumerable<CategoryResponse>> SearchAsync(string keyword)
-        {
-            if (string.IsNullOrWhiteSpace(keyword))
-                return Enumerable.Empty<CategoryResponse>();
-            var categories = await _unitOfWork.CategoryRepository.SearchAsync(keyword);
-            Logging.Info("Search for keyword '{Keyword}' returned {Count} results", keyword, categories.Count());
-            return _mapper.Map<IEnumerable<CategoryResponse>>(categories);
         }
     }
 }
